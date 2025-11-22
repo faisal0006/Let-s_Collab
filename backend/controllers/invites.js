@@ -5,74 +5,99 @@ const prisma = new PrismaClient();
 const sendInvite = async (req, res) => {
   try {
     const boardId = req.params.boardId;
-    const { userId, receiverEmail, role } = req.body;
+    const { userId, receiverIdentifier, role } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: "userId is required" });
     }
 
-    if (!receiverEmail) {
-      return res.status(400).json({ error: "receiverEmail is required" });
+    if (!receiverIdentifier) {
+      return res.status(400).json({
+        error: "receiverIdentifier (email or username) is required"
+      });
     }
 
-    // check if board exists
+    // check if board exists and get collaborators
     const board = await prisma.board.findUnique({
       where: { id: boardId },
+      include: {
+        collaborators: {
+          where: { userId: userId },
+        },
+      },
     });
 
     if (!board) {
       return res.status(404).json({ error: "Board not found" });
     }
 
-    // only owner can send invites
-    if (board.ownerId !== userId) {
-      return res.status(403).json({ 
-        error: "Only board owner can send invites" 
+    // Check if user is owner or editor
+    const isOwner = board.ownerId === userId;
+    const isEditor = board.collaborators.some(
+      (collab) => collab.role === "EDITOR"
+    );
+
+    if (!isOwner && !isEditor) {
+      return res.status(403).json({
+        error: "Only board owner or editors can send invites"
       });
     }
 
-    // check if receiver exists
-    const receiver = await prisma.user.findUnique({
-      where: { email: receiverEmail },
-    });
+    // check if receiver exists by email or username
+    const isEmail = receiverIdentifier.includes("@");
+    let receiver;
+
+    if (isEmail) {
+      receiver = await prisma.user.findUnique({
+        where: { email: receiverIdentifier },
+      });
+    } else {
+      receiver = await prisma.user.findUnique({
+        where: { username: receiverIdentifier },
+      });
+    }
+
+    if (!receiver) {
+      return res.status(404).json({
+        error: `User not found with ${isEmail ? 'email' : 'username'}: ${receiverIdentifier}`
+      });
+    }
 
     // can't invite yourself
-    if (receiver && receiver.id === userId) {
-      return res.status(400).json({ 
-        error: "Cannot send invite to yourself" 
+    if (receiver.id === userId) {
+      return res.status(400).json({
+        error: "Cannot send invite to yourself"
       });
     }
 
     // check if already a collaborator
-    if (receiver) {
-      const existingCollaborator = await prisma.boardCollaborator.findUnique({
-        where: {
-          boardId_userId: {
-            boardId: boardId,
-            userId: receiver.id,
-          },
+    const existingCollaborator = await prisma.boardCollaborator.findUnique({
+      where: {
+        boardId_userId: {
+          boardId: boardId,
+          userId: receiver.id,
         },
-      });
+      },
+    });
 
-      if (existingCollaborator) {
-        return res.status(400).json({ 
-          error: "User is already a collaborator on this board" 
-        });
-      }
+    if (existingCollaborator) {
+      return res.status(400).json({
+        error: "User is already a collaborator on this board"
+      });
     }
 
-    // check if there's already a pending invite
+    // check if there's already a pending invite for this user
     const existingInvite = await prisma.invite.findFirst({
       where: {
         boardId: boardId,
-        receiverEmail: receiverEmail,
+        receiverId: receiver.id,
         status: "PENDING",
       },
     });
 
     if (existingInvite) {
-      return res.status(400).json({ 
-        error: "An invite is already pending for this email" 
+      return res.status(400).json({
+        error: "An invite is already pending for this user"
       });
     }
 
@@ -81,8 +106,8 @@ const sendInvite = async (req, res) => {
       data: {
         boardId: boardId,
         senderId: userId,
-        receiverEmail: receiverEmail,
-        receiverId: receiver?.id,
+        receiverEmail: receiver.email,
+        receiverId: receiver.id,
         role: role || "EDITOR",
         status: "PENDING",
       },
@@ -113,9 +138,9 @@ const sendInvite = async (req, res) => {
       createdAt: invite.createdAt,
     };
 
-    return res.status(201).json({ 
-      message: "Invite sent successfully", 
-      invite: response 
+    return res.status(201).json({
+      message: "Invite sent successfully",
+      invite: response
     });
   } catch (error) {
     console.error("error:", error);
@@ -130,8 +155,8 @@ const getPendingInvites = async (req, res) => {
     const userEmail = req.query.userEmail;
 
     if (!userId || !userEmail) {
-      return res.status(400).json({ 
-        error: "userId and userEmail are required" 
+      return res.status(400).json({
+        error: "userId and userEmail are required"
       });
     }
 
@@ -201,8 +226,8 @@ const getBoardInvites = async (req, res) => {
 
     // only owner can view board invites
     if (board.ownerId !== userId) {
-      return res.status(403).json({ 
-        error: "Only board owner can view invites" 
+      return res.status(403).json({
+        error: "Only board owner can view invites"
       });
     }
 
@@ -259,8 +284,8 @@ const acceptInvite = async (req, res) => {
 
     // check if invite is still pending
     if (invite.status !== "PENDING") {
-      return res.status(400).json({ 
-        error: "Invite is no longer pending" 
+      return res.status(400).json({
+        error: "Invite is no longer pending"
       });
     }
 
@@ -275,8 +300,8 @@ const acceptInvite = async (req, res) => {
 
     // check if user is the intended receiver
     if (invite.receiverId !== userId && invite.receiverEmail !== user.email) {
-      return res.status(403).json({ 
-        error: "This invite is not for you" 
+      return res.status(403).json({
+        error: "This invite is not for you"
       });
     }
 
@@ -296,8 +321,8 @@ const acceptInvite = async (req, res) => {
         where: { id: inviteId },
         data: { status: "ACCEPTED" },
       });
-      return res.status(400).json({ 
-        error: "You are already a collaborator on this board" 
+      return res.status(400).json({
+        error: "You are already a collaborator on this board"
       });
     }
 
@@ -312,15 +337,15 @@ const acceptInvite = async (req, res) => {
       }),
       prisma.invite.update({
         where: { id: inviteId },
-        data: { 
+        data: {
           status: "ACCEPTED",
           receiverId: userId,
         },
       }),
     ]);
 
-    return res.status(200).json({ 
-      message: "Invite accepted successfully" 
+    return res.status(200).json({
+      message: "Invite accepted successfully"
     });
   } catch (error) {
     console.error("error:", error);
@@ -349,8 +374,8 @@ const declineInvite = async (req, res) => {
 
     // check if invite is still pending
     if (invite.status !== "PENDING") {
-      return res.status(400).json({ 
-        error: "Invite is no longer pending" 
+      return res.status(400).json({
+        error: "Invite is no longer pending"
       });
     }
 
@@ -365,22 +390,22 @@ const declineInvite = async (req, res) => {
 
     // check if user is the intended receiver
     if (invite.receiverId !== userId && invite.receiverEmail !== user.email) {
-      return res.status(403).json({ 
-        error: "This invite is not for you" 
+      return res.status(403).json({
+        error: "This invite is not for you"
       });
     }
 
     // update invite status
     await prisma.invite.update({
       where: { id: inviteId },
-      data: { 
+      data: {
         status: "DECLINED",
         receiverId: userId,
       },
     });
 
-    return res.status(200).json({ 
-      message: "Invite declined successfully" 
+    return res.status(200).json({
+      message: "Invite declined successfully"
     });
   } catch (error) {
     console.error("error:", error);
@@ -412,8 +437,8 @@ const cancelInvite = async (req, res) => {
 
     // only owner can cancel invites
     if (invite.board.ownerId !== userId) {
-      return res.status(403).json({ 
-        error: "Only board owner can cancel invites" 
+      return res.status(403).json({
+        error: "Only board owner can cancel invites"
       });
     }
 
@@ -422,8 +447,8 @@ const cancelInvite = async (req, res) => {
       where: { id: inviteId },
     });
 
-    return res.status(200).json({ 
-      message: "Invite cancelled successfully" 
+    return res.status(200).json({
+      message: "Invite cancelled successfully"
     });
   } catch (error) {
     console.error("error:", error);
