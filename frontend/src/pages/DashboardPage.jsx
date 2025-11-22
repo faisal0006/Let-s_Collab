@@ -40,6 +40,7 @@ import {
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { useThemeMode } from '../hooks/useThemeMode';
+import { InviteBox } from '../components';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -198,6 +199,8 @@ function DashboardPage() {
           >
             {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
+
+          <InviteBox />
 
           <IconButton
             color="inherit"

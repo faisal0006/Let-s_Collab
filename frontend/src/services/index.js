@@ -91,4 +91,6 @@ export const whiteboardService = {
   },
 };
 
+export { default as inviteService } from "./inviteService";
+
 export default fetchWithAuth;

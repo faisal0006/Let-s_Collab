@@ -13,10 +13,6 @@ import {
   Menu,
   MenuItem,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Stack,
 } from "@mui/material";
 import {
@@ -30,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
+import { ShareScreen } from "../components";
 
 function WhiteboardPage() {
   const { id } = useParams();
@@ -187,7 +184,7 @@ function WhiteboardPage() {
       if (excalidrawRef.current && lastSaved !== 0) {
         const elements = excalidrawRef.current.getSceneElements();
         const serialized = JSON.stringify(elements || []);
-        
+
         if (serialized !== lastSavedSerializedRef.current) {
           e.preventDefault();
           e.returnValue = '';
@@ -283,7 +280,7 @@ function WhiteboardPage() {
     if (excalidrawRef.current && lastSaved !== 0) {
       const elements = excalidrawRef.current.getSceneElements();
       const serialized = JSON.stringify(elements || []);
-      
+
       if (serialized !== lastSavedSerializedRef.current) {
         await saveToBackend();
       }
@@ -372,7 +369,7 @@ function WhiteboardPage() {
                 background: "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",
               }}
             >
-              Share
+              Manage Access
             </Button>
           </Stack>
         </Toolbar>
@@ -387,34 +384,12 @@ function WhiteboardPage() {
         <MenuItem onClick={() => handleExport("svg")}>Export as SVG</MenuItem>
       </Menu>
 
-      <Dialog
+      <ShareScreen
         open={shareDialogOpen}
         onClose={() => setShareDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Share Whiteboard</DialogTitle>
-        <DialogContent>
-          <Typography color="text.secondary" sx={{ mb: 2 }}>
-            Collaboration features are coming soon! You'll be able to:
-          </Typography>
-          <Stack spacing={1}>
-            <Typography variant="body2">
-              ✓ Invite collaborators by email
-            </Typography>
-            <Typography variant="body2">
-              ✓ Set permissions (Viewer, Editor, Owner)
-            </Typography>
-            <Typography variant="body2">✓ Generate shareable links</Typography>
-            <Typography variant="body2">
-              ✓ See live cursors and presence
-            </Typography>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShareDialogOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+        boardId={id}
+        boardTitle={boardTitle}
+      />
 
       <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
         <Excalidraw
