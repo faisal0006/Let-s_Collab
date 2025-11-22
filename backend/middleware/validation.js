@@ -44,9 +44,64 @@ const validatePassword = (req, res, next) => {
   const { password } = req.body;
 
   if (password) {
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
-        error: "Password must be at least 6 characters long",
+        error: "Password must be at least 8 characters long",
+      });
+    }
+    
+    // Check for uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      return res.status(400).json({
+        error: "Password must contain at least one uppercase letter",
+      });
+    }
+    
+    // Check for lowercase letter
+    if (!/[a-z]/.test(password)) {
+      return res.status(400).json({
+        error: "Password must contain at least one lowercase letter",
+      });
+    }
+    
+    // Check for special character
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return res.status(400).json({
+        error: "Password must contain at least one special character",
+      });
+    }
+  }
+
+  next();
+};
+
+/**
+ * Validate username format
+ */
+const validateUsername = (req, res, next) => {
+  const { username } = req.body;
+
+  if (username) {
+    const usernameRegex = /^[a-z0-9._-]+$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        error: "Username can only contain lowercase letters, numbers, dots, hyphens, and underscores",
+      });
+    }
+    if (username.length < 3) {
+      return res.status(400).json({
+        error: "Username must be at least 3 characters long",
+      });
+    }
+    if (username.length > 30) {
+      return res.status(400).json({
+        error: "Username must be less than 30 characters",
+      });
+    }
+    // Prevent usernames starting or ending with dots/hyphens
+    if (/^[.-]|[.-]$/.test(username)) {
+      return res.status(400).json({
+        error: "Username cannot start or end with dots or hyphens",
       });
     }
   }
@@ -58,4 +113,5 @@ module.exports = {
   validateFields,
   validateEmail,
   validatePassword,
+  validateUsername,
 };

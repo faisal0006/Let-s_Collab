@@ -35,6 +35,7 @@ function LoginPage() {
   const isSignUp = location.pathname === '/signup';
 
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -44,7 +45,7 @@ function LoginPage() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   const handleGoogleSignIn = () => {
-    // Redirect to backend Google OAuth
+    // Redirect to backend Google OAuth for both login and signup
     window.location.href = `${API_URL}/auth/google`;
   };
 
@@ -56,7 +57,7 @@ function LoginPage() {
     try {
       const endpoint = isSignUp ? '/auth/register' : '/auth/login';
       const body = isSignUp 
-        ? { name, email, password }
+        ? { name, username, email, password }
         : { email, password };
 
       const response = await fetch(`${API_URL}${endpoint}`, {
@@ -171,6 +172,26 @@ function LoginPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+
+              {isSignUp && (
+                <TextField
+                  fullWidth
+                  label="Username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
+                  placeholder="johndoe"
+                  required
+                  helperText="3-30 characters: letters, numbers, dots, hyphens, underscores"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

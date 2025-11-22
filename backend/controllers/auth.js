@@ -16,8 +16,9 @@ const getCookieOptions = () => {
 
 async function register(req, res) {
   try {
-    const { name, email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
+    // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -28,12 +29,24 @@ async function register(req, res) {
         .json({ error: "User already exists with this email" });
     }
 
+    // Check if username already exists
+    const existingUsername = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (existingUsername) {
+      return res
+        .status(400)
+        .json({ error: "Username is already taken" });
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
+        username,
         passwordHash,
       },
     });
@@ -109,7 +122,7 @@ async function googleAuthCallback(req, res) {
 
     res.cookie("token", token, getCookieOptions());
 
-    // Redirect to frontend with token
+    // Redirect to dashboard
     res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
   } catch (err) {
     console.error("Google auth callback error:", err);

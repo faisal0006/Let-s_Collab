@@ -35,11 +35,24 @@ passport.use(
           return done(null, user);
         }
 
-        // Create new user
+        // Create new user with username from session
+        // Generate a temporary username as fallback
+        let baseUsername = profile.emails[0].value.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '');
+        if (baseUsername.length < 3) {
+          baseUsername = baseUsername + Math.random().toString(36).substring(2, 5);
+        }
+        let username = baseUsername;
+        let counter = 1;
+        while (await prisma.user.findUnique({ where: { username } })) {
+          username = `${baseUsername}${counter}`;
+          counter++;
+        }
+
         user = await prisma.user.create({
           data: {
             email: profile.emails[0].value,
             name: profile.displayName,
+            username,
             googleId: profile.id,
             passwordHash: null, // OAuth users don't have passwords
           },
