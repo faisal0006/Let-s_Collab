@@ -1,25 +1,16 @@
 import React from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 
 function LoadingSpinner({ message = 'Loading...', size = 40 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '200px',
-        gap: 2,
-      }}
-    >
-      <CircularProgress size={size} />
+    <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
+      <Loader2 className="animate-spin text-primary" size={size} />
       {message && (
-        <Typography variant="body1" color="text.secondary">
+        <p className="text-base text-muted-foreground">
           {message}
-        </Typography>
+        </p>
       )}
-    </Box>
+    </div>
   );
 }
 

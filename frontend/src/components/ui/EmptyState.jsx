@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
 
 function EmptyState({
   icon,
@@ -10,45 +9,31 @@ function EmptyState({
   iconSize = 80,
 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        py: 10,
-        px: 3,
-      }}
-    >
+    <div className="flex flex-col items-center justify-center text-center py-20 px-6">
       {icon && (
-        <Box sx={{ fontSize: iconSize, color: 'text.secondary', mb: 2 }}>
+        <div className="text-muted-foreground mb-4" style={{ fontSize: iconSize }}>
           {icon}
-        </Box>
+        </div>
       )}
       {title && (
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+        <h3 className="text-2xl font-semibold mb-2">
           {title}
-        </Typography>
+        </h3>
       )}
       {description && (
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 500 }}>
+        <p className="text-base text-muted-foreground mb-6 max-w-md">
           {description}
-        </Typography>
+        </p>
       )}
       {actionLabel && onAction && (
-        <Button
-          variant="contained"
-          size="large"
+        <button
           onClick={onAction}
-          sx={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-          }}
+          className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
         >
           {actionLabel}
-        </Button>
+        </button>
       )}
-    </Box>
+    </div>
   );
 }
 
