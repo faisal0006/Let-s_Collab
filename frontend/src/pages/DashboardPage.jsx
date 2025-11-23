@@ -1,42 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CardActionArea,
-  Grid,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Menu,
-  MenuItem,
-  TextField,
-  InputAdornment,
-  Chip,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Stack,
-} from "@mui/material";
-import {
-  Add as AddIcon,
-  Search as SearchIcon,
-  MoreVert as MoreVertIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  AccountCircle as AccountCircleIcon,
-  Logout as LogoutIcon,
-  Dashboard as DashboardIcon,
-  FolderOpen as FolderOpenIcon,
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
-} from "@mui/icons-material";
+  Plus,
+  Search,
+  MoreVertical,
+  Trash2,
+  UserCircle,
+  LogOut,
+  LayoutDashboard,
+  FolderOpen,
+  Sun,
+  Moon,
+} from 'lucide-react';
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { useThemeMode } from '../hooks/useThemeMode';
@@ -178,283 +153,239 @@ function DashboardPage() {
   };
 
   return (
-    <Box
-      sx={{ flexGrow: 1, bgcolor: "background.default", minHeight: "100vh" }}
-    >
-      <AppBar position="static" color="primary" elevation={2}>
-        <Toolbar>
-          <DashboardIcon sx={{ mr: 2 }} />
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontWeight: 600 }}
-          >
-            Let's Collab - Dashboard
-          </Typography>
+    <div className="min-h-screen bg-background">
+      <header className="bg-primary text-primary-foreground shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <LayoutDashboard size={24} />
+              <h1 className="text-xl font-semibold">Let's Collab - Dashboard</h1>
+            </div>
 
-          <IconButton
-            color="inherit"
-            onClick={toggleTheme}
-            sx={{ mr: 1 }}
-          >
-            {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
-
-          <InviteBox />
-
-          <IconButton
-            color="inherit"
-            onClick={(e) => setUserMenuAnchor(e.currentTarget)}
-          >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: "secondary.main" }}>
-              {user?.name?.charAt(0).toUpperCase() || "U"}
-            </Avatar>
-          </IconButton>
-
-          <Menu
-            anchorEl={userMenuAnchor}
-            open={Boolean(userMenuAnchor)}
-            onClose={() => setUserMenuAnchor(null)}
-          >
-            <MenuItem disabled>
-              <AccountCircleIcon sx={{ mr: 1 }} />
-              {user?.name || "User"}
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <LogoutIcon sx={{ mr: 1 }} />
-              Logout
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box sx={{ mb: 4 }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "space-between",
-              alignItems: { xs: "stretch", sm: "center" },
-              gap: 2,
-              mb: 3,
-            }}
-          >
-            <Box>
-              <Typography
-                variant="h4"
-                component="h1"
-                sx={{ fontWeight: 700, mb: 1 }}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors"
               >
-                My Whiteboards
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
+                {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
+              <InviteBox />
+
+              <div className="relative">
+                <button
+                  onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                  className="flex items-center justify-center w-8 h-8 bg-secondary text-secondary-foreground rounded-full font-semibold"
+                >
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </button>
+
+                {Boolean(userMenuAnchor) && (
+                  <div className="fixed inset-0 z-50" onClick={() => setUserMenuAnchor(null)}>
+                    <div
+                      className="absolute right-4 top-16 bg-card border border-border rounded-lg shadow-xl w-48"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="p-2 border-b border-border flex items-center gap-2 text-muted-foreground">
+                        <UserCircle size={20} />
+                        <span className="text-sm">{user?.name || "User"}</span>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full px-4 py-2 text-left hover:bg-accent flex items-center gap-2 text-sm"
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-4xl font-bold mb-2">My Whiteboards</h2>
+              <p className="text-muted-foreground">
                 {whiteboards.length}{" "}
                 {whiteboards.length === 1 ? "whiteboard" : "whiteboards"}
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<AddIcon />}
+            <button
               onClick={createNewWhiteboard}
-              sx={{
-                py: 1.5,
-                px: 3,
-                background: "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",
-              }}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
             >
+              <Plus size={20} />
               New Whiteboard
-            </Button>
-          </Box>
+            </button>
+          </div>
 
-          <TextField
-            fullWidth
-            placeholder="Search whiteboards..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            sx={{ maxWidth: 600 }}
-          />
-        </Box>
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <input
+              type="text"
+              placeholder="Search whiteboards..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
 
         {filteredBoards.length === 0 ? (
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 10,
-            }}
-          >
-            <FolderOpenIcon
-              sx={{ fontSize: 80, color: "text.secondary", mb: 2 }}
-            />
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+          <div className="text-center py-20">
+            <FolderOpen size={80} className="mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-2xl font-semibold mb-2">
               {searchQuery ? "No whiteboards found" : "No whiteboards yet"}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            </h3>
+            <p className="text-muted-foreground mb-6">
               {searchQuery
                 ? "Try adjusting your search"
                 : "Create your first whiteboard to get started"}
-            </Typography>
+            </p>
             {!searchQuery && (
-              <Button
-                variant="contained"
-                size="large"
-                startIcon={<AddIcon />}
+              <button
                 onClick={createNewWhiteboard}
-                sx={{
-                  background:
-                    "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",
-                }}
+                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
               >
+                <Plus size={20} />
                 Create Your First Whiteboard
-              </Button>
+              </button>
             )}
-          </Box>
+          </div>
         ) : (
-          <Grid container spacing={3}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredBoards.map((board) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={board.id}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    transition: "transform 0.2s, box-shadow 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: 6,
-                    },
-                  }}
+              <div
+                key={board.id}
+                className="bg-card border border-border rounded-lg overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
+              >
+                <div
+                  onClick={() => openWhiteboard(board.id)}
+                  className="cursor-pointer"
                 >
-                  <CardActionArea onClick={() => openWhiteboard(board.id)}>
-                    <Box
-                      sx={{
-                        height: 180,
-                        bgcolor: "grey.100",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderBottom: 1,
-                        borderColor: "divider",
-                      }}
+                  <div className="h-44 bg-gray-100 dark:bg-gray-800 flex items-center justify-center border-b border-border">
+                    <svg
+                      viewBox="0 0 100 100"
+                      className="w-3/5 h-3/5"
                     >
-                      <svg
-                        viewBox="0 0 100 100"
-                        style={{ width: "60%", height: "60%" }}
-                      >
-                        <rect
-                          x="10"
-                          y="10"
-                          width="80"
-                          height="60"
-                          fill="#e0e0e0"
-                          rx="4"
-                        />
-                        <line
-                          x1="20"
-                          y1="25"
-                          x2="60"
-                          y2="25"
-                          stroke="#999"
-                          strokeWidth="2"
-                        />
-                        <line
-                          x1="20"
-                          y1="35"
-                          x2="75"
-                          y2="35"
-                          stroke="#999"
-                          strokeWidth="2"
-                        />
-                        <circle cx="25" cy="55" r="8" fill="#999" />
-                        <rect
-                          x="40"
-                          y="48"
-                          width="25"
-                          height="15"
-                          fill="#999"
-                          rx="2"
-                        />
-                      </svg>
-                    </Box>
+                      <rect
+                        x="10"
+                        y="10"
+                        width="80"
+                        height="60"
+                        fill="#e0e0e0"
+                        rx="4"
+                      />
+                      <line
+                        x1="20"
+                        y1="25"
+                        x2="60"
+                        y2="25"
+                        stroke="#999"
+                        strokeWidth="2"
+                      />
+                      <line
+                        x1="20"
+                        y1="35"
+                        x2="75"
+                        y2="35"
+                        stroke="#999"
+                        strokeWidth="2"
+                      />
+                      <circle cx="25" cy="55" r="8" fill="#999" />
+                      <rect
+                        x="40"
+                        y="48"
+                        width="25"
+                        height="15"
+                        fill="#999"
+                        rx="2"
+                      />
+                    </svg>
+                  </div>
 
-                    <CardContent>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                          <Typography
-                            variant="h6"
-                            component="h3"
-                            noWrap
-                            sx={{ fontWeight: 600, mb: 1 }}
-                          >
-                            {board.title}
-                          </Typography>
-                          <Chip
-                            label={`Edited ${formatDate(board.updatedAt)}`}
-                            size="small"
-                            sx={{ fontSize: "0.75rem" }}
-                          />
-                        </Box>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold mb-2 truncate">
+                          {board.title}
+                        </h3>
+                        <span className="inline-block px-3 py-1 bg-accent text-accent-foreground rounded-full text-xs">
+                          Edited {formatDate(board.updatedAt)}
+                        </span>
+                      </div>
 
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleMenuOpen(e, board)}
-                          sx={{ ml: 1 }}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
+                      <button
+                        onClick={(e) => handleMenuOpen(e, board)}
+                        className="p-1 hover:bg-accent rounded ml-2"
+                      >
+                        <MoreVertical size={20} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
-          </Grid>
+          </div>
         )}
-      </Container>
+      </div>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleDeleteClick}>
-          <DeleteIcon sx={{ mr: 1 }} color="error" />
-          Delete
-        </MenuItem>
-      </Menu>
+      {/* Board Options Menu */}
+      {Boolean(anchorEl) && (
+        <div className="fixed inset-0 z-50" onClick={handleMenuClose}>
+          <div
+            className="absolute bg-card border border-border rounded-lg shadow-xl w-40"
+            style={{
+              top: anchorEl.getBoundingClientRect().bottom + 8,
+              left: anchorEl.getBoundingClientRect().left - 120,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={handleDeleteClick}
+              className="w-full px-4 py-2 text-left hover:bg-accent flex items-center gap-2 text-sm text-destructive"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
 
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>Delete Whiteboard?</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete "{selectedBoard?.title}"? This
-            action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={deleteWhiteboard} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+      {/* Delete Confirmation Dialog */}
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-card rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-xl font-semibold mb-4">Delete Whiteboard?</h3>
+            <p className="text-muted-foreground mb-6">
+              Are you sure you want to delete "{selectedBoard?.title}"? This
+              action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteDialogOpen(false)}
+                className="px-4 py-2 border border-input rounded-lg hover:bg-accent"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteWhiteboard}
+                className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
