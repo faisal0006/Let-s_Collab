@@ -6,10 +6,22 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("./config/passport");
 const route = require("./routes");
-
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const { initializeSocket } = require("./controllers/socket");
 
 const app = express();
+const httpServer = createServer(app);
 const PORT = 3000;
+
+// Initialize Socket.IO with CORS
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
 
 // Middleware
 app.use(
@@ -40,6 +52,10 @@ app.use(passport.session());
 // Routes
 app.use("/", route);
 
-app.listen(PORT, () => {
+// Initialize Socket.IO handlers
+initializeSocket(io);
+
+httpServer.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
+  console.log(`Socket.IO server running`);
 });
