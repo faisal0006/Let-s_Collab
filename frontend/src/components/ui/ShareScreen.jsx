@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { User, Send, Users, Clock, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { inviteService } from "../../services/inviteService";
@@ -15,13 +15,7 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
     const [boardData, setBoardData] = useState(null);
     const [dataLoading, setDataLoading] = useState(true);
 
-    useEffect(() => {
-        if (open) {
-            loadBoardData();
-        }
-    }, [open, boardId]);
-
-    const loadBoardData = async () => {
+    const loadBoardData = useCallback(async () => {
         try {
             setDataLoading(true);
             const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -38,7 +32,7 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
                     user.id
                 );
                 setPendingInvites(invitesResponse.invites || []);
-            } catch (err) {
+            } catch {
                 setPendingInvites([]);
             }
         } catch (error) {
@@ -46,7 +40,13 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
         } finally {
             setDataLoading(false);
         }
-    };
+    }, [boardId]);
+
+    useEffect(() => {
+        if (open) {
+            loadBoardData();
+        }
+    }, [open, boardId, loadBoardData]);
 
     const handleSendInvite = async () => {
         if (!inviteIdentifier.trim()) {
