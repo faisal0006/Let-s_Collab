@@ -193,7 +193,7 @@ function DashboardPage() {
                             {user?.name?.charAt(0).toUpperCase() || "U"}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate">{user?.name || "User"}</h3>
+                            <h3 className="font-semibold text-foreground truncate">{user?.name || "User"}</h3>
                             <p className="text-xs text-muted-foreground">Profile</p>
                           </div>
                         </div>
@@ -204,21 +204,21 @@ function DashboardPage() {
                         {/* Name */}
                         <div>
                           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Name</p>
-                          <p className="text-sm font-medium">{user?.name || "-"}</p>
+                          <p className="text-sm font-medium text-foreground">{user?.name || "-"}</p>
                         </div>
 
                         {/* Username */}
                         {user?.username && (
                           <div>
                             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Username</p>
-                            <p className="text-sm font-medium">@{user.username}</p>
+                            <p className="text-sm font-medium text-foreground">{user.username}</p>
                           </div>
                         )}
 
                         {/* Email */}
                         <div>
                           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Email</p>
-                          <p className="text-sm font-medium truncate">{user?.email || "-"}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{user?.email || "-"}</p>
                         </div>
                       </div>
 
