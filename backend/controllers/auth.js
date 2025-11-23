@@ -59,7 +59,7 @@ async function register(req, res) {
 
     res.status(201).json({
       success: true,
-      user: { id: user.id, name: user.name, email: user.email, token },
+      user: { id: user.id, name: user.name, username: user.username, email: user.email, token },
     });
   } catch (err) {
     console.error(err);
@@ -93,7 +93,7 @@ async function login(req, res) {
     res.json({
       success: true,
       message: "Logged in successfully",
-      user: { id: user.id, name: user.name, email: user.email, token },
+      user: { id: user.id, name: user.name, username: user.username, email: user.email, token },
     });
   } catch (err) {
     console.error(err);
