@@ -10,10 +10,12 @@ import {
   Check,
   X,
   Save,
+  Users,
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { ShareScreen } from "../components";
+import { io } from "socket.io-client";
 
 function WhiteboardPage() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ function WhiteboardPage() {
     excalidrawRef.current = api;
   }, []);
 
+  const socketRef = useRef(null);
   const applyingRemoteUpdate = useRef(false);
   const lastSerializedElementsRef = useRef("");
   const lastSavedSerializedRef = useRef("");
@@ -35,6 +38,8 @@ function WhiteboardPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [boardData, setBoardData] = useState(null);
   const [lastSaved, setLastSaved] = useState(Date.now());
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [cursors, setCursors] = useState({});
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -58,6 +63,118 @@ function WhiteboardPage() {
     };
 
     loadBoard();
+
+    // Initialize Socket.IO connection
+    const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    socketRef.current = io(BACKEND_URL, {
+      withCredentials: true,
+      transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+    });
+
+    // Connection status handlers
+    socketRef.current.on("connect", () => {
+      console.log("✅ Socket.IO connected:", socketRef.current.id);
+    });
+
+    socketRef.current.on("connect_error", (error) => {
+      console.error("❌ Socket.IO connection error:", error.message);
+    });
+
+    socketRef.current.on("disconnect", (reason) => {
+      console.log("🔌 Socket.IO disconnected:", reason);
+    });
+
+    socketRef.current.on("reconnect", (attemptNumber) => {
+      console.log("🔄 Socket.IO reconnected after", attemptNumber, "attempts");
+    });
+
+    // Join the board room
+    socketRef.current.emit("join-board", {
+      boardId: id,
+      userId: savedUser.id,
+      userName: savedUser.name,
+    });
+
+    // Listen for user joined events
+    socketRef.current.on("user-joined", (data) => {
+      setActiveUsers(data.activeUsers || []);
+      if (data.userName && data.userId !== savedUser.id) {
+        toast.success(`${data.userName} joined the board`, {
+          duration: 2000,
+          icon: "👋",
+        });
+      }
+    });
+
+    // Listen for user left events
+    socketRef.current.on("user-left", (data) => {
+      setActiveUsers(data.activeUsers || []);
+      if (data.userName && data.userId !== savedUser.id) {
+        toast(`${data.userName} left the board`, {
+          duration: 2000,
+          icon: "👋",
+        });
+      }
+      // Remove cursor when user leaves
+      setCursors((prev) => {
+        const newCursors = { ...prev };
+        delete newCursors[data.socketId];
+        return newCursors;
+      });
+    });
+
+    // Listen for element updates from other users
+    socketRef.current.on("element-update", (data) => {
+      if (data.userId !== savedUser.id && excalidrawRef.current) {
+        applyingRemoteUpdate.current = true;
+        excalidrawRef.current.updateScene({
+          elements: data.elements,
+        });
+        requestAnimationFrame(() => {
+          applyingRemoteUpdate.current = false;
+        });
+      }
+    });
+
+    // Listen for cursor movements
+    socketRef.current.on("cursor-move", (data) => {
+      if (data.userId !== savedUser.id) {
+        setCursors((prev) => ({
+          ...prev,
+          [data.socketId]: {
+            x: data.x,
+            y: data.y,
+            userName: data.userName,
+            userId: data.userId,
+          },
+        }));
+      }
+    });
+
+    // Listen for title updates
+    socketRef.current.on("title-update", (data) => {
+      if (data.userId !== savedUser.id) {
+        setBoardTitle(data.title);
+        setTempTitle(data.title);
+      }
+    });
+
+    // Handle socket errors
+    socketRef.current.on("error", (error) => {
+      console.error("Socket error:", error);
+      toast.error(error.message || "Connection error");
+    });
+
+    // Cleanup on unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit("leave-board");
+        socketRef.current.disconnect();
+      }
+    };
   }, [id, navigate]);
 
   useEffect(() => {
@@ -114,6 +231,16 @@ function WhiteboardPage() {
       } catch {
         // Ignore serialization errors
       }
+    }
+
+    // Emit real-time update to other users
+    if (socketRef.current && elements) {
+      const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+      socketRef.current.emit("element-update", {
+        boardId: id,
+        elements: elements,
+        userId: savedUser?.id,
+      });
     }
 
     setLastSaved(Date.now());
@@ -210,6 +337,14 @@ function WhiteboardPage() {
       setBoardTitle(tempTitle);
       toast.success("Title updated");
       setIsEditingTitle(false);
+
+      // Emit title update to other users
+      if (socketRef.current) {
+        socketRef.current.emit("title-update", {
+          boardId: id,
+          title: tempTitle,
+        });
+      }
     } catch (error) {
       console.error("Error updating title:", error);
       toast.error(error.message || "Failed to update title");
@@ -275,6 +410,25 @@ function WhiteboardPage() {
     navigate("/dashboard");
   };
 
+  // Handle pointer move for cursor tracking
+  const handlePointerUpdate = (payload) => {
+    if (!socketRef.current) return;
+
+    const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+    if (!savedUser) return;
+
+    const { pointer } = payload;
+    
+    if (pointer && pointer.x !== undefined && pointer.y !== undefined) {
+      socketRef.current.emit("cursor-move", {
+        boardId: id,
+        x: pointer.x,
+        y: pointer.y,
+        userName: savedUser.name,
+      });
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <header className="bg-card border-b border-border shadow-sm">
@@ -328,6 +482,13 @@ function WhiteboardPage() {
             <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium flex items-center gap-2 mr-4">
               <Save size={16} />
               Saving...
+            </div>
+          )}
+
+          {activeUsers.length > 0 && (
+            <div className="px-3 py-2 bg-accent rounded-lg text-sm font-medium flex items-center gap-2 mr-4">
+              <Users size={16} />
+              <span>{activeUsers.length} active</span>
             </div>
           )}
 
@@ -394,7 +555,46 @@ function WhiteboardPage() {
             appState: { viewBackgroundColor: "#ffffff" },
           }}
           onChange={handleChange}
+          onPointerUpdate={handlePointerUpdate}
         />
+      </div>
+
+      {/* Remote cursors overlay */}
+      <div className="pointer-events-none fixed inset-0 z-50">
+        {Object.entries(cursors).map(([socketId, cursor]) => (
+          <div
+            key={socketId}
+            className="absolute transition-all duration-100"
+            style={{
+              left: `${cursor.x}px`,
+              top: `${cursor.y}px`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <div className="relative">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="drop-shadow-lg"
+              >
+                <path
+                  d="M5.65376 12.3673L8.47492 15.1885L10.8162 18.9917L13.0234 13.7806L18.2346 11.5734L14.4314 9.23208L11.6102 6.41092L10.4489 10.5032L5.65376 12.3673Z"
+                  fill="#FF6B6B"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <div className="absolute top-5 left-5 px-2 py-1 bg-[#FF6B6B] text-white text-xs rounded-md whitespace-nowrap">
+                {cursor.userName}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
