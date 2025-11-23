@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    IconButton, Badge, Menu, Typography, Box, Button, Divider, Stack,
-    Avatar, CircularProgress,
-} from "@mui/material";
-import {
-    Mail as MailIcon, CheckCircle as CheckCircleIcon, Cancel as CancelIcon,
-    Dashboard as DashboardIcon, Refresh as RefreshIcon,
-} from "@mui/icons-material";
+import { Mail, CheckCircle, X, LayoutDashboard, RefreshCw, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { inviteService } from "../../services/inviteService";
 
@@ -105,154 +98,99 @@ function InviteBox() {
     };
 
     return (
-        <>
-            <IconButton color="inherit" onClick={handleMenuOpen}>
-                <Badge badgeContent={invites.length} color="error">
-                    <MailIcon />
-                </Badge>
-            </IconButton>
-
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                    sx: {
-                        width: 400,
-                        maxHeight: 500,
-                    },
-                }}
+        <div className="relative">
+            <button
+                onClick={handleMenuOpen}
+                className="relative p-2 hover:bg-accent rounded-lg transition-colors"
             >
-                <Box
-                    sx={{
-                        px: 2,
-                        py: 1.5,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}
-                >
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Invitations
-                    </Typography>
-                    <IconButton
-                        size="small"
-                        onClick={loadInvites}
-                        disabled={loading}
-                        sx={{ ml: 1 }}
-                    >
-                        {loading ? <CircularProgress size={20} /> : <RefreshIcon />}
-                    </IconButton>
-                </Box>
-                <Divider />
-
-                {loading && invites.length === 0 ? (
-                    <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                        <CircularProgress size={32} />
-                    </Box>
-                ) : invites.length === 0 ? (
-                    <Box sx={{ textAlign: "center", py: 4, px: 2 }}>
-                        <MailIcon
-                            sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                            No new invitations
-                        </Typography>
-                    </Box>
-                ) : (
-                    <Box sx={{ maxHeight: 400, overflow: "auto" }}>
-                        {invites.map((invite) => (
-                            <Box key={invite.id}>
-                                <Box sx={{ px: 2, py: 2 }}>
-                                    <Stack spacing={1.5}>
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "flex-start",
-                                                gap: 1.5,
-                                            }}
-                                        >
-                                            <Avatar
-                                                sx={{
-                                                    width: 40,
-                                                    height: 40,
-                                                    bgcolor: "primary.main",
-                                                    fontSize: "1rem",
-                                                }}
-                                            >
-                                                {invite.senderName?.charAt(0).toUpperCase() || "?"}
-                                            </Avatar>
-                                            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                                    {invite.senderName}
-                                                </Typography>
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
-                                                    sx={{ mb: 0.5 }}
-                                                >
-                                                    invited you to collaborate on
-                                                </Typography>
-                                                <Box
-                                                    sx={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: 0.5,
-                                                        mb: 0.5,
-                                                    }}
-                                                >
-                                                    <DashboardIcon fontSize="small" color="action" />
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{ fontWeight: 600 }}
-                                                        noWrap
-                                                    >
-                                                        {invite.boardTitle}
-                                                    </Typography>
-                                                </Box>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    as {invite.role.toLowerCase()} •{" "}
-                                                    {formatDate(invite.createdAt)}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-
-                                        <Stack direction="row" spacing={1}>
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                startIcon={<CheckCircleIcon />}
-                                                onClick={() => handleAcceptInvite(invite)}
-                                                disabled={processingInvite === invite.id}
-                                                sx={{
-                                                    flex: 1,
-                                                    background:
-                                                        "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                                                }}
-                                            >
-                                                {processingInvite === invite.id ? "..." : "Accept"}
-                                            </Button>
-                                            <Button
-                                                size="small"
-                                                variant="outlined"
-                                                color="error"
-                                                startIcon={<CancelIcon />}
-                                                onClick={() => handleDeclineInvite(invite)}
-                                                disabled={processingInvite === invite.id}
-                                                sx={{ flex: 1 }}
-                                            >
-                                                Decline
-                                            </Button>
-                                        </Stack>
-                                    </Stack>
-                                </Box>
-                                <Divider />
-                            </Box>
-                        ))}
-                    </Box>
+                <Mail size={20} />
+                {invites.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {invites.length}
+                    </span>
                 )}
-            </Menu>
-        </>
+            </button>
+
+            {Boolean(anchorEl) && (
+                <div className="fixed inset-0 z-50" onClick={handleMenuClose}>
+                    <div
+                        className="absolute right-4 top-16 bg-card border border-border rounded-lg shadow-xl w-96"
+                        style={{ maxHeight: "500px" }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="px-4 py-3 flex justify-between items-center border-b border-border">
+                            <h3 className="text-lg font-semibold">Invitations</h3>
+                            <button
+                                onClick={loadInvites}
+                                disabled={loading}
+                                className="p-1 hover:bg-accent rounded"
+                            >
+                                {loading ? <Loader2 className="animate-spin" size={20} /> : <RefreshCw size={20} />}
+                            </button>
+                        </div>
+
+                        {loading && invites.length === 0 ? (
+                            <div className="flex justify-center py-8">
+                                <Loader2 className="animate-spin text-primary" size={32} />
+                            </div>
+                        ) : invites.length === 0 ? (
+                            <div className="text-center py-8 px-4">
+                                <Mail className="mx-auto text-muted-foreground mb-2" size={48} />
+                                <p className="text-sm text-muted-foreground">No new invitations</p>
+                            </div>
+                        ) : (
+                            <div className="max-h-96 overflow-auto">
+                                {invites.map((invite) => (
+                                    <div key={invite.id} className="border-b border-border last:border-0">
+                                        <div className="p-4 space-y-3">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                                                    {invite.senderName?.charAt(0).toUpperCase() || "?"}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-semibold text-sm">{invite.senderName}</p>
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        invited you to collaborate on
+                                                    </p>
+                                                    <div className="flex items-center gap-1 mb-1">
+                                                        <LayoutDashboard size={14} className="text-muted-foreground" />
+                                                        <p className="font-semibold text-sm truncate">
+                                                            {invite.boardTitle}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        as {invite.role.toLowerCase()} • {formatDate(invite.createdAt)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleAcceptInvite(invite)}
+                                                    disabled={processingInvite === invite.id}
+                                                    className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-1"
+                                                >
+                                                    <CheckCircle size={16} />
+                                                    {processingInvite === invite.id ? "..." : "Accept"}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeclineInvite(invite)}
+                                                    disabled={processingInvite === invite.id}
+                                                    className="flex-1 px-3 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive/10 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-1"
+                                                >
+                                                    <X size={16} />
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
