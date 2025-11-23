@@ -3,27 +3,14 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  TextField,
-  Menu,
-  MenuItem,
-  Chip,
-  Stack,
-} from "@mui/material";
-import {
-  ArrowBack as ArrowBackIcon,
-  FileDownload as FileDownloadIcon,
-  Share as ShareIcon,
-  Edit as EditIcon,
-  Check as CheckIcon,
-  Close as CloseIcon,
-  SaveAlt as SaveAltIcon,
-} from "@mui/icons-material";
+  ArrowLeft,
+  Download,
+  Share2,
+  Edit3,
+  Check,
+  X,
+  Save,
+} from 'lucide-react';
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { ShareScreen } from "../components";
@@ -289,100 +276,108 @@ function WhiteboardPage() {
   };
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <AppBar position="static" color="default" elevation={2}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            onClick={handleBackToDashboard}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-
-          {isEditingTitle ? (
-            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-              <TextField
-                size="small"
-                value={tempTitle}
-                onChange={(e) => setTempTitle(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") handleTitleSave();
-                  if (e.key === "Escape") handleTitleCancel();
-                }}
-                autoFocus
-                sx={{ mr: 1, maxWidth: 400 }}
-              />
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={handleTitleSave}
-              >
-                <CheckIcon />
-              </IconButton>
-              <IconButton size="small" onClick={handleTitleCancel}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexGrow: 1,
-                cursor: "pointer",
-              }}
-              onClick={handleTitleEdit}
+    <div className="h-screen flex flex-col">
+      <header className="bg-card border-b border-border shadow-sm">
+        <div className="flex items-center justify-between px-4 h-16">
+          <div className="flex items-center gap-4 flex-1">
+            <button
+              onClick={handleBackToDashboard}
+              className="p-2 hover:bg-accent rounded-lg transition-colors"
             >
-              <Typography variant="h6" sx={{ fontWeight: 600, mr: 1 }}>
-                {boardTitle}
-              </Typography>
-              <IconButton size="small">
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          )}
+              <ArrowLeft size={20} />
+            </button>
+
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2 flex-1 max-w-md">
+                <input
+                  type="text"
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleTitleSave();
+                    if (e.key === "Escape") handleTitleCancel();
+                  }}
+                  autoFocus
+                  className="flex-1 px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  onClick={handleTitleSave}
+                  className="p-2 text-primary hover:bg-primary/10 rounded-lg"
+                >
+                  <Check size={20} />
+                </button>
+                <button
+                  onClick={handleTitleCancel}
+                  className="p-2 hover:bg-accent rounded-lg"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={handleTitleEdit}
+                className="flex items-center gap-2 cursor-pointer hover:bg-accent px-3 py-2 rounded-lg transition-colors"
+              >
+                <h1 className="text-xl font-semibold">{boardTitle}</h1>
+                <Edit3 size={16} className="text-muted-foreground" />
+              </div>
+            )}
+          </div>
 
           {isSaving && (
-            <Chip
-              label="Saving..."
-              size="small"
-              color="primary"
-              sx={{ mr: 2 }}
-              icon={<SaveAltIcon />}
-            />
+            <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium flex items-center gap-2 mr-4">
+              <Save size={16} />
+              Saving...
+            </div>
           )}
 
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="outlined"
-              startIcon={<FileDownloadIcon />}
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-            >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<ShareIcon />}
-              onClick={() => setShareDialogOpen(true)}
-              sx={{
-                background: "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",
-              }}
-            >
-              Manage Access
-            </Button>
-          </Stack>
-        </Toolbar>
-      </AppBar>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                className="px-4 py-2 border border-input rounded-lg hover:bg-accent flex items-center gap-2"
+              >
+                <Download size={18} />
+                Export
+              </button>
 
-      <Menu
-        anchorEl={exportMenuAnchor}
-        open={Boolean(exportMenuAnchor)}
-        onClose={() => setExportMenuAnchor(null)}
-      >
-        <MenuItem onClick={() => handleExport("png")}>Export as PNG</MenuItem>
-        <MenuItem onClick={() => handleExport("svg")}>Export as SVG</MenuItem>
-      </Menu>
+              {Boolean(exportMenuAnchor) && (
+                <div className="fixed inset-0 z-50" onClick={() => setExportMenuAnchor(null)}>
+                  <div
+                    className="absolute bg-card border border-border rounded-lg shadow-xl w-48"
+                    style={{
+                      top: exportMenuAnchor.getBoundingClientRect().bottom + 8,
+                      left: exportMenuAnchor.getBoundingClientRect().left,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => handleExport("png")}
+                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                    >
+                      Export as PNG
+                    </button>
+                    <button
+                      onClick={() => handleExport("svg")}
+                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                    >
+                      Export as SVG
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShareDialogOpen(true)}
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors flex items-center gap-2"
+            >
+              <Share2 size={18} />
+              Manage Access
+            </button>
+          </div>
+        </div>
+      </header>
 
       <ShareScreen
         open={shareDialogOpen}
@@ -391,7 +386,7 @@ function WhiteboardPage() {
         boardTitle={boardTitle}
       />
 
-      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+      <div className="flex-1 overflow-hidden">
         <Excalidraw
           excalidrawAPI={setExcalidrawApi}
           initialData={{
@@ -400,8 +395,8 @@ function WhiteboardPage() {
           }}
           onChange={handleChange}
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

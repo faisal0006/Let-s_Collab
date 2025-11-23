@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function AuthCallbackPage() {
@@ -58,21 +58,12 @@ function AuthCallbackPage() {
   }, [searchParams, navigate]);
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      }}
-    >
-      <CircularProgress size={60} sx={{ color: 'white', mb: 3 }} />
-      <Typography variant="h6" sx={{ color: 'white' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+      <Loader2 className="animate-spin text-primary mb-6" size={60} />
+      <h2 className="text-xl font-semibold text-foreground">
         Completing sign in...
-      </Typography>
-    </Box>
+      </h2>
+    </div>
   );
 }
 
