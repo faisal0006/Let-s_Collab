@@ -183,13 +183,46 @@ function DashboardPage() {
                 {Boolean(userMenuAnchor) && (
                   <div className="fixed inset-0 z-50" onClick={() => setUserMenuAnchor(null)}>
                     <div
-                      className="absolute right-4 top-16 bg-card border border-border rounded-lg shadow-xl w-48"
+                      className="absolute right-4 top-16 bg-card border border-border rounded-lg shadow-xl w-72"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="p-2 border-b border-border flex items-center gap-2 text-muted-foreground">
-                        <UserCircle size={20} />
-                        <span className="text-sm">{user?.name || "User"}</span>
+                      {/* Profile Header */}
+                      <div className="p-4 border-b border-border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/50 rounded-full flex items-center justify-center text-lg font-bold text-primary-foreground">
+                            {user?.name?.charAt(0).toUpperCase() || "U"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold truncate">{user?.name || "User"}</h3>
+                            <p className="text-xs text-muted-foreground">Profile</p>
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Profile Details */}
+                      <div className="p-4 space-y-3 border-b border-border">
+                        {/* Name */}
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Name</p>
+                          <p className="text-sm font-medium">{user?.name || "-"}</p>
+                        </div>
+
+                        {/* Username */}
+                        {user?.username && (
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Username</p>
+                            <p className="text-sm font-medium">@{user.username}</p>
+                          </div>
+                        )}
+
+                        {/* Email */}
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Email</p>
+                          <p className="text-sm font-medium truncate">{user?.email || "-"}</p>
+                        </div>
+                      </div>
+
+                      {/* Logout Button */}
                       <button
                         onClick={handleLogout}
                         className="w-full px-4 py-2 text-left hover:bg-accent flex items-center gap-2 text-sm"
