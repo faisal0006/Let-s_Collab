@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    Dialog, DialogTitle, DialogContent, DialogActions, Button,
-    TextField, Select, MenuItem, FormControl, InputLabel, Stack, Typography, Box,
-    CircularProgress, Alert, Avatar, Chip, List, ListItem, ListItemAvatar,
-    ListItemText, IconButton, Tabs, Tab,
-} from "@mui/material";
-import {
-    Person as PersonIcon, Send as SendIcon, People as PeopleIcon,
-    Pending as PendingIcon, Cancel as CancelIcon,
-} from "@mui/icons-material";
+import { User, Send, Users, Clock, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { inviteService } from "../../services/inviteService";
 import { whiteboardService } from "../../services/index";
@@ -135,235 +126,237 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
 
     const totalPeople = (boardData ? 1 : 0) + collaborators.length;
 
+    if (!open) return null;
+
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-            <DialogTitle>
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <PeopleIcon color="primary" />
-                        <Typography variant="h6" component="span">
-                            Manage Access - "{boardTitle}"
-                        </Typography>
-                    </Box>
-                    <Chip
-                        label={`${totalPeople} ${totalPeople === 1 ? "person" : "people"}`}
-                        color="primary"
-                        size="small"
-                    />
-                </Box>
-            </DialogTitle>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+                {/* Header */}
+                <div className="border-b border-border p-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <Users className="text-primary" size={24} />
+                            <h2 className="text-xl font-semibold">
+                                Manage Access - "{boardTitle}"
+                            </h2>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                                {totalPeople} {totalPeople === 1 ? "person" : "people"}
+                            </span>
+                            <button onClick={handleClose} className="hover:bg-accent rounded-lg p-1">
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-            <Tabs
-                value={tabValue}
-                onChange={(e, newValue) => setTabValue(newValue)}
-                sx={{ px: 3, borderBottom: 1, borderColor: "divider" }}
-            >
-                <Tab label="Invite" />
-                <Tab label={`Collaborators (${totalPeople})`} />
-                <Tab label={`Pending Invites (${pendingInvites.length})`} />
-            </Tabs>
+                {/* Tabs */}
+                <div className="border-b border-border flex px-6">
+                    <button
+                        onClick={() => setTabValue(0)}
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                            tabValue === 0
+                                ? "border-primary text-primary"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        Invite
+                    </button>
+                    <button
+                        onClick={() => setTabValue(1)}
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                            tabValue === 1
+                                ? "border-primary text-primary"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        Collaborators ({totalPeople})
+                    </button>
+                    <button
+                        onClick={() => setTabValue(2)}
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                            tabValue === 2
+                                ? "border-primary text-primary"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        Pending ({pendingInvites.length})
+                    </button>
+                </div>
 
-            <DialogContent sx={{ minHeight: 300 }}>
-                {tabValue === 0 && (
-                    <Stack spacing={3} sx={{ mt: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Invite collaborators to work on this whiteboard together in
-                            real-time.
-                        </Typography>
+                {/* Content */}
+                <div className="p-6 overflow-y-auto" style={{ minHeight: "300px", maxHeight: "50vh" }}>
+                    {tabValue === 0 && (
+                        <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Invite collaborators to work on this whiteboard together in real-time.
+                            </p>
 
-                        {error && (
-                            <Alert severity="error" onClose={() => setError("")}>
-                                {error}
-                            </Alert>
-                        )}
+                            {error && (
+                                <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg flex items-center justify-between">
+                                    <span className="text-sm">{error}</span>
+                                    <button onClick={() => setError("")}>
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
 
-                        <TextField
-                            fullWidth
-                            label="Email or Username"
-                            placeholder="colleague@example.com or username"
-                            value={inviteIdentifier}
-                            onChange={(e) => setInviteIdentifier(e.target.value)}
-                            disabled={loading}
-                            InputProps={{
-                                startAdornment: (
-                                    <PersonIcon sx={{ mr: 1, color: "action.active" }} />
-                                ),
-                            }}
-                            onKeyPress={(e) => {
-                                if (e.key === "Enter") {
-                                    handleSendInvite();
-                                }
-                            }}
-                        />
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Email or Username</label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                                    <input
+                                        type="text"
+                                        placeholder="colleague@example.com or username"
+                                        value={inviteIdentifier}
+                                        onChange={(e) => setInviteIdentifier(e.target.value)}
+                                        onKeyPress={(e) => e.key === "Enter" && handleSendInvite()}
+                                        disabled={loading}
+                                        className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background"
+                                    />
+                                </div>
+                            </div>
 
-                        <FormControl fullWidth disabled={loading}>
-                            <InputLabel>Role</InputLabel>
-                            <Select
-                                value={inviteRole}
-                                label="Role"
-                                onChange={(e) => setInviteRole(e.target.value)}
+                            <div>
+                                <label className="block text-sm font-medium mb-2">Role</label>
+                                <select
+                                    value={inviteRole}
+                                    onChange={(e) => setInviteRole(e.target.value)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background"
+                                >
+                                    <option value="VIEWER">Viewer - Can view the whiteboard (read-only)</option>
+                                    <option value="EDITOR">Editor - Can view, edit, and invite others</option>
+                                </select>
+                            </div>
+
+                            <button
+                                onClick={handleSendInvite}
+                                disabled={loading || !inviteIdentifier.trim()}
+                                className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                <MenuItem value="VIEWER">
-                                    <Box>
-                                        <Typography variant="body1">Viewer</Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            Can view the whiteboard (read-only)
-                                        </Typography>
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="EDITOR">
-                                    <Box>
-                                        <Typography variant="body1">Editor</Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            Can view, edit, and invite others
-                                        </Typography>
-                                    </Box>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={16} />
+                                        Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send size={16} />
+                                        Send Invite
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
 
-                        <Button
-                            onClick={handleSendInvite}
-                            variant="contained"
-                            disabled={loading || !inviteIdentifier.trim()}
-                            startIcon={loading ? <CircularProgress size={16} /> : <SendIcon />}
-                            sx={{
-                                background: "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",
-                            }}
-                        >
-                            {loading ? "Sending..." : "Send Invite"}
-                        </Button>
-                    </Stack>
-                )}
-
-                {tabValue === 1 && (
-                    <Box sx={{ mt: 2 }}>
-                        {dataLoading ? (
-                            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                                <CircularProgress />
-                            </Box>
-                        ) : (
-                            <List>
-                                {boardData?.owner && (
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <Avatar sx={{ bgcolor: "primary.main" }}>
+                    {tabValue === 1 && (
+                        <div>
+                            {dataLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="animate-spin text-primary" size={32} />
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {boardData?.owner && (
+                                        <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
+                                            <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                                                 {boardData.owner.name?.charAt(0).toUpperCase()}
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={boardData.owner.name}
-                                            secondary={boardData.owner.email}
-                                        />
-                                        <Chip label="Owner" color="primary" size="small" />
-                                    </ListItem>
-                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-medium">{boardData.owner.name}</p>
+                                                <p className="text-sm text-muted-foreground">{boardData.owner.email}</p>
+                                            </div>
+                                            <span className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-xs font-medium">
+                                                Owner
+                                            </span>
+                                        </div>
+                                    )}
 
-                                {collaborators.map((collab) => (
-                                    <ListItem key={collab.userId}>
-                                        <ListItemAvatar>
-                                            <Avatar sx={{ bgcolor: "secondary.main" }}>
+                                    {collaborators.map((collab) => (
+                                        <div key={collab.userId} className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent/30">
+                                            <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center font-semibold">
                                                 {collab.name?.charAt(0).toUpperCase()}
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={collab.name}
-                                            secondary={collab.email}
-                                        />
-                                        <Chip
-                                            label={collab.role}
-                                            color={collab.role === "EDITOR" ? "success" : "default"}
-                                            size="small"
-                                        />
-                                    </ListItem>
-                                ))}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-medium">{collab.name}</p>
+                                                <p className="text-sm text-muted-foreground">{collab.email}</p>
+                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                collab.role === "EDITOR"
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                                                    : "bg-muted text-muted-foreground"
+                                            }`}>
+                                                {collab.role}
+                                            </span>
+                                        </div>
+                                    ))}
 
-                                {collaborators.length === 0 && (
-                                    <Box sx={{ textAlign: "center", py: 4 }}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            No collaborators yet. Invite someone to get started!
-                                        </Typography>
-                                    </Box>
-                                )}
-                            </List>
-                        )}
-                    </Box>
-                )}
+                                    {collaborators.length === 0 && (
+                                        <div className="text-center py-8">
+                                            <p className="text-sm text-muted-foreground">
+                                                No collaborators yet. Invite someone to get started!
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                {tabValue === 2 && (
-                    <Box sx={{ mt: 2 }}>
-                        {dataLoading ? (
-                            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                                <CircularProgress />
-                            </Box>
-                        ) : pendingInvites.length === 0 ? (
-                            <Box sx={{ textAlign: "center", py: 4 }}>
-                                <PendingIcon
-                                    sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
-                                />
-                                <Typography variant="body2" color="text.secondary">
-                                    No pending invites
-                                </Typography>
-                            </Box>
-                        ) : (
-                            <List>
-                                {pendingInvites.map((invite) => (
-                                    <ListItem
-                                        key={invite.id}
-                                        secondaryAction={
-                                            <IconButton
-                                                edge="end"
+                    {tabValue === 2 && (
+                        <div>
+                            {dataLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="animate-spin text-primary" size={32} />
+                                </div>
+                            ) : pendingInvites.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <Clock className="mx-auto text-muted-foreground mb-2" size={48} />
+                                    <p className="text-sm text-muted-foreground">No pending invites</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {pendingInvites.map((invite) => (
+                                        <div key={invite.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent/30">
+                                            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                                                <Clock className="text-amber-600 dark:text-amber-400" size={20} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-medium">{invite.receiverEmail}</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Role: {invite.role} • Sent {new Date(invite.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 rounded-full text-xs font-medium mr-2">
+                                                Pending
+                                            </span>
+                                            <button
                                                 onClick={() => handleCancelInvite(invite.id)}
-                                                color="error"
+                                                className="text-destructive hover:bg-destructive/10 rounded-lg p-2"
                                             >
-                                                <CancelIcon />
-                                            </IconButton>
-                                        }
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar sx={{ bgcolor: "warning.main" }}>
-                                                <PendingIcon />
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={invite.receiverEmail}
-                                            secondary={
-                                                <>
-                                                    <Typography component="span" variant="body2">
-                                                        Role: {invite.role}
-                                                    </Typography>
-                                                    {" • "}
-                                                    <Typography component="span" variant="body2">
-                                                        Sent{" "}
-                                                        {new Date(invite.createdAt).toLocaleDateString()}
-                                                    </Typography>
-                                                </>
-                                            }
-                                        />
-                                        <Chip
-                                            label="Pending"
-                                            color="warning"
-                                            size="small"
-                                            sx={{ mr: 1 }}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        )}
-                    </Box>
-                )}
-            </DialogContent>
+                                                <X size={18} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button onClick={handleClose}>Close</Button>
-            </DialogActions>
-        </Dialog>
+                {/* Footer */}
+                <div className="border-t border-border p-4 flex justify-end">
+                    <button
+                        onClick={handleClose}
+                        className="px-6 py-2 rounded-lg hover:bg-accent font-medium"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }
 
