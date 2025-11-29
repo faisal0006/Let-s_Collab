@@ -231,9 +231,12 @@ const getBoardInvites = async (req, res) => {
       });
     }
 
-    // get all invites for this board
+    // get all pending invites for this board
     const invites = await prisma.invite.findMany({
-      where: { boardId: boardId },
+      where: {
+        boardId: boardId,
+        status: "PENDING"
+      },
       include: {
         sender: {
           select: {
