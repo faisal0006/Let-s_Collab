@@ -10,6 +10,7 @@ import {
   Sun,
   Moon,
   ArrowRight,
+  UserCircle,
 } from 'lucide-react';
 import { useThemeMode } from '../hooks/useThemeMode';
 
@@ -90,6 +91,13 @@ function HomePage() {
                   <span className="hidden sm:inline text-sm text-muted-foreground">
                     Welcome, {user.name || user.username || user.email}
                   </span>
+                  <button
+                    onClick={() => navigate('/profile')}
+                    className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                    title="Profile"
+                  >
+                    <UserCircle size={20} />
+                  </button>
                   <button
                     onClick={() => navigate('/dashboard')}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"

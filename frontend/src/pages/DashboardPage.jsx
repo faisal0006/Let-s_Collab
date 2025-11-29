@@ -224,8 +224,18 @@ function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Logout Button */}
-                      <div className="p-2">
+                      {/* Menu Actions */}
+                      <div className="p-2 space-y-1">
+                        <button
+                          onClick={() => {
+                            setUserMenuAnchor(null);
+                            navigate('/profile');
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-accent rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
+                        >
+                          <UserCircle size={16} />
+                          Edit Profile
+                        </button>
                         <button
                           onClick={handleLogout}
                           className="w-full px-4 py-2 text-left hover:bg-destructive/10 text-destructive rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
