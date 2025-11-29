@@ -131,10 +131,6 @@ function HomePage() {
         <section className="relative overflow-hidden pt-16 md:pt-24 pb-32">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background"></div>
           <div className="container mx-auto px-4 text-center">
-            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-8">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
-              Now with AI-powered suggestions
-            </div>
             <h2 className="text-5xl md:text-7xl font-extrabold text-foreground tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
               Collaborate in <span className="text-primary">Real-Time</span> on Digital Whiteboards
             </h2>
@@ -164,15 +160,15 @@ function HomePage() {
                 Go to Your Whiteboards <ArrowRight size={20} />
               </button>
             )}
-            
+
             {/* Abstract decoration */}
             <div className="mt-16 relative mx-auto max-w-5xl">
-               <div className="aspect-[16/9] bg-card rounded-xl border border-border shadow-2xl overflow-hidden relative">
-                  <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>
-                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 font-bold text-4xl">
-                    Interactive Whiteboard Preview
-                  </div>
-               </div>
+              <div className="aspect-[16/9] bg-card rounded-xl border border-border shadow-2xl overflow-hidden relative">
+                <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 font-bold text-4xl">
+                  Interactive Whiteboard Preview
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -235,7 +231,7 @@ function HomePage() {
           </div>
         </section>
       </main>
-      
+
       <footer className="py-8 border-t border-border bg-background">
         <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
           <p>&copy; {new Date().getFullYear()} Let's Collab. All rights reserved.</p>

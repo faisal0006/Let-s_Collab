@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { User, Send, Users, Clock, X, Loader2 } from "lucide-react";
+import { User, Send, Users, Clock, X, Loader2, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { inviteService } from "../../services/inviteService";
 import { whiteboardService } from "../../services/index";
@@ -14,10 +14,15 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
     const [pendingInvites, setPendingInvites] = useState([]);
     const [boardData, setBoardData] = useState(null);
     const [dataLoading, setDataLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    const loadBoardData = useCallback(async () => {
+    const loadBoardData = useCallback(async (isRefresh = false) => {
         try {
-            setDataLoading(true);
+            if (isRefresh) {
+                setRefreshing(true);
+            } else {
+                setDataLoading(true);
+            }
             const user = JSON.parse(localStorage.getItem("user") || "null");
             if (!user) return;
 
@@ -38,7 +43,11 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
         } catch (error) {
             console.error("Error loading board data:", error);
         } finally {
-            setDataLoading(false);
+            if (isRefresh) {
+                setRefreshing(false);
+            } else {
+                setDataLoading(false);
+            }
         }
     }, [boardId]);
 
@@ -144,6 +153,17 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
                             <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                                 {totalPeople} {totalPeople === 1 ? "person" : "people"}
                             </span>
+                            <button
+                                onClick={() => loadBoardData(true)}
+                                disabled={refreshing || dataLoading}
+                                className="hover:bg-accent rounded-lg p-2 disabled:opacity-50 transition-all"
+                                title="Refresh collaborators and invites"
+                            >
+                                <RefreshCw
+                                    size={18}
+                                    className={refreshing ? "animate-spin" : ""}
+                                />
+                            </button>
                             <button onClick={handleClose} className="hover:bg-accent rounded-lg p-1">
                                 <X size={20} />
                             </button>
@@ -155,31 +175,28 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
                 <div className="border-b border-border flex px-6">
                     <button
                         onClick={() => setTabValue(0)}
-                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                            tabValue === 0
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${tabValue === 0
                                 ? "border-primary text-primary"
                                 : "border-transparent text-muted-foreground hover:text-foreground"
-                        }`}
+                            }`}
                     >
                         Invite
                     </button>
                     <button
                         onClick={() => setTabValue(1)}
-                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                            tabValue === 1
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${tabValue === 1
                                 ? "border-primary text-primary"
                                 : "border-transparent text-muted-foreground hover:text-foreground"
-                        }`}
+                            }`}
                     >
                         Collaborators ({totalPeople})
                     </button>
                     <button
                         onClick={() => setTabValue(2)}
-                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                            tabValue === 2
+                        className={`px-4 py-3 font-medium border-b-2 transition-colors ${tabValue === 2
                                 ? "border-primary text-primary"
                                 : "border-transparent text-muted-foreground hover:text-foreground"
-                        }`}
+                            }`}
                     >
                         Pending ({pendingInvites.length})
                     </button>
@@ -283,11 +300,10 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
                                                 <p className="font-medium">{collab.name}</p>
                                                 <p className="text-sm text-muted-foreground">{collab.email}</p>
                                             </div>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                collab.role === "EDITOR"
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${collab.role === "EDITOR"
                                                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                                                     : "bg-muted text-muted-foreground"
-                                            }`}>
+                                                }`}>
                                                 {collab.role}
                                             </span>
                                         </div>

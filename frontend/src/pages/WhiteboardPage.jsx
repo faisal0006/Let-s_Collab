@@ -418,7 +418,7 @@ function WhiteboardPage() {
     if (!savedUser) return;
 
     const { pointer } = payload;
-    
+
     if (pointer && pointer.x !== undefined && pointer.y !== undefined) {
       socketRef.current.emit("cursor-move", {
         boardId: id,

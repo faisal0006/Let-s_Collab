@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {Dialog,DialogTitle,DialogContent,DialogActions,Button,TextField,Select,MenuItem,
-    FormControl,InputLabel,Stack,Typography,Box,CircularProgress,Alert,Divider,
-    Avatar,Chip,List,ListItem,ListItemAvatar,ListItemText,IconButton,Tabs,Tab,
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem,
+    FormControl, InputLabel, Stack, Typography, Box, CircularProgress, Alert, Divider,
+    Avatar, Chip, List, ListItem, ListItemAvatar, ListItemText, IconButton, Tabs, Tab,
 } from "@mui/material";
-import {Person as PersonIcon,Send as SendIcon,People as PeopleIcon,
-    Pending as PendingIcon,Cancel as CancelIcon,
+import {
+    Person as PersonIcon, Send as SendIcon, People as PeopleIcon,
+    Pending as PendingIcon, Cancel as CancelIcon, Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { inviteService } from "../services/inviteService";
@@ -20,6 +22,7 @@ function ShareDialog({ open, onClose, boardId, boardTitle }) {
     const [pendingInvites, setPendingInvites] = useState([]);
     const [boardData, setBoardData] = useState(null);
     const [dataLoading, setDataLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -27,9 +30,13 @@ function ShareDialog({ open, onClose, boardId, boardTitle }) {
         }
     }, [open, boardId]);
 
-    const loadBoardData = async () => {
+    const loadBoardData = async (isRefresh = false) => {
         try {
-            setDataLoading(true);
+            if (isRefresh) {
+                setRefreshing(true);
+            } else {
+                setDataLoading(true);
+            }
             const user = JSON.parse(localStorage.getItem("user") || "null");
             if (!user) return;
 
@@ -50,7 +57,11 @@ function ShareDialog({ open, onClose, boardId, boardTitle }) {
         } catch (error) {
             console.error("Error loading board data:", error);
         } finally {
-            setDataLoading(false);
+            if (isRefresh) {
+                setRefreshing(false);
+            } else {
+                setDataLoading(false);
+            }
         }
     };
 
@@ -148,11 +159,38 @@ function ShareDialog({ open, onClose, boardId, boardTitle }) {
                             Manage Access - "{boardTitle}"
                         </Typography>
                     </Box>
-                    <Chip
-                        label={`${totalPeople} ${totalPeople === 1 ? "person" : "people"}`}
-                        color="primary"
-                        size="small"
-                    />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Chip
+                            label={`${totalPeople} ${totalPeople === 1 ? "person" : "people"}`}
+                            color="primary"
+                            size="small"
+                        />
+                        <IconButton
+                            onClick={() => loadBoardData(true)}
+                            disabled={refreshing || dataLoading}
+                            size="small"
+                            title="Refresh collaborators and invites"
+                            sx={{
+                                color: "black",
+                                "&:hover": {
+                                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                                "&.Mui-disabled": {
+                                    color: "rgba(0, 0, 0, 0.26)",
+                                },
+                            }}
+                        >
+                            <RefreshIcon
+                                sx={{
+                                    animation: refreshing ? "spin 1s linear infinite" : "none",
+                                    "@keyframes spin": {
+                                        "0%": { transform: "rotate(0deg)" },
+                                        "100%": { transform: "rotate(360deg)" },
+                                    },
+                                }}
+                            />
+                        </IconButton>
+                    </Box>
                 </Box>
             </DialogTitle>
 
@@ -365,3 +403,4 @@ function ShareDialog({ open, onClose, boardId, boardTitle }) {
 }
 
 export default ShareDialog;
+
