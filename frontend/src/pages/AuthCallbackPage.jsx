@@ -27,29 +27,36 @@ function AuthCallbackPage() {
       // Fetch user data with the token
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       
-      fetch(`${API_URL}/auth/me`, {
+      // Store token first so the cookie is available
+      document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+      
+      fetch(`${API_URL}/users/me`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
         credentials: 'include',
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+          return res.json();
+        })
         .then(data => {
           if (data.user) {
             // Store user info with token
             localStorage.setItem('user', JSON.stringify({ ...data.user, token }));
-            toast.success('Successfully signed in with Google!');
-            navigate('/dashboard');
+            toast.success('Successfully signed in!');
+            navigate('/');
           } else {
-            throw new Error('Failed to fetch user data');
+            throw new Error('No user data received');
           }
         })
         .catch(err => {
           console.error('Auth callback error:', err);
-          // Still try to navigate with the token
-          localStorage.setItem('user', JSON.stringify({ token }));
-          toast.success('Successfully signed in!');
-          navigate('/dashboard');
+          toast.error('Failed to complete sign in. Please try again.');
+          navigate('/login');
         });
     } else {
       toast.error('No authentication token received');

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Paintbrush,
@@ -16,6 +16,20 @@ import { useThemeMode } from '../hooks/useThemeMode';
 function HomePage() {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useThemeMode();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Failed to parse user data:', e);
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   const features = [
     {
@@ -71,18 +85,34 @@ function HomePage() {
               >
                 {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <button
-                onClick={() => navigate('/login')}
-                className="hidden sm:block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => navigate('/signup')}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
-              >
-                Sign Up
-              </button>
+              {user ? (
+                <>
+                  <span className="hidden sm:inline text-sm text-muted-foreground">
+                    Welcome, {user.name || user.username || user.email}
+                  </span>
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Dashboard
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="hidden sm:block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => navigate('/signup')}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -103,20 +133,29 @@ function HomePage() {
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
               Create, share, and collaborate on whiteboards with your team. Perfect for brainstorming, design, and project planning.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {!user ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2"
+                >
+                  Get Started Free <ArrowRight size={20} />
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-8 py-4 text-lg bg-card border border-border text-foreground rounded-full hover:bg-accent transition-colors font-semibold"
+                >
+                  Sign In
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => navigate('/signup')}
-                className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2"
+                onClick={() => navigate('/dashboard')}
+                className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 mx-auto"
               >
-                Get Started Free <ArrowRight size={20} />
+                Go to Your Whiteboards <ArrowRight size={20} />
               </button>
-              <button
-                onClick={() => navigate('/login')}
-                className="px-8 py-4 text-lg bg-card border border-border text-foreground rounded-full hover:bg-accent transition-colors font-semibold"
-              >
-                View Demo
-              </button>
-            </div>
+            )}
             
             {/* Abstract decoration */}
             <div className="mt-16 relative mx-auto max-w-5xl">

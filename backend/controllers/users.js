@@ -26,6 +26,7 @@ async function getCurrentUser(req, res) {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         googleId: true,
         createdAt: true,
