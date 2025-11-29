@@ -13,6 +13,7 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { useThemeMode } from '../hooks/useThemeMode';
+import Logo from '../components/Logo';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -72,9 +73,7 @@ function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xl">
-                L
-              </div>
+              <Logo className="w-10 h-10" />
               <h1 className="text-xl font-bold tracking-tight text-foreground">
                 Let's Collab
               </h1>

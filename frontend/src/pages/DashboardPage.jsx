@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { useThemeMode } from '../hooks/useThemeMode';
 import { InviteBox } from '../components';
+import Logo from '../components/Logo';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -158,10 +159,8 @@ function DashboardPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg">
-                L
-              </div>
-              <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+              <Logo className="w-10 h-10" />
+              <h1 className="text-lg font-semibold tracking-tight">Let's Collab</h1>
             </div>
 
             <div className="flex items-center gap-3">
@@ -321,7 +320,7 @@ function DashboardPage() {
                   <div className="h-48 bg-muted/30 flex items-center justify-center border-b border-border/50 relative overflow-hidden group-hover:bg-muted/50 transition-colors">
                     {/* Placeholder Preview */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
-                       <svg
+                      <svg
                         viewBox="0 0 100 100"
                         className="w-1/2 h-1/2 text-muted-foreground/30"
                         fill="currentColor"
@@ -332,7 +331,7 @@ function DashboardPage() {
                         <rect x="30" y="45" width="40" height="4" rx="2" />
                       </svg>
                     </div>
-                    
+
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
                   </div>
