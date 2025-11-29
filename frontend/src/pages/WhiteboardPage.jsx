@@ -430,19 +430,19 @@ function WhiteboardPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-card border-b border-border shadow-sm">
+    <div className="h-screen flex flex-col bg-background">
+      <header className="bg-background/95 backdrop-blur border-b border-border/50 shadow-sm z-10">
         <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center gap-4 flex-1">
             <button
               onClick={handleBackToDashboard}
-              className="p-2 hover:bg-accent rounded-lg transition-colors"
+              className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft size={20} />
             </button>
 
             {isEditingTitle ? (
-              <div className="flex items-center gap-2 flex-1 max-w-md">
+              <div className="flex items-center gap-2 flex-1 max-w-md animate-in fade-in duration-200">
                 <input
                   type="text"
                   value={tempTitle}
@@ -452,75 +452,75 @@ function WhiteboardPage() {
                     if (e.key === "Escape") handleTitleCancel();
                   }}
                   autoFocus
-                  className="flex-1 px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 px-3 py-1.5 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
                 />
                 <button
                   onClick={handleTitleSave}
-                  className="p-2 text-primary hover:bg-primary/10 rounded-lg"
+                  className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                 >
-                  <Check size={20} />
+                  <Check size={18} />
                 </button>
                 <button
                   onClick={handleTitleCancel}
-                  className="p-2 hover:bg-accent rounded-lg"
+                  className="p-1.5 hover:bg-accent rounded-lg transition-colors"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
             ) : (
               <div
                 onClick={handleTitleEdit}
-                className="flex items-center gap-2 cursor-pointer hover:bg-accent px-3 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 px-3 py-1.5 rounded-lg transition-colors group"
               >
-                <h1 className="text-xl font-semibold">{boardTitle}</h1>
-                <Edit3 size={16} className="text-muted-foreground" />
+                <h1 className="text-lg font-semibold text-foreground">{boardTitle}</h1>
+                <Edit3 size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             )}
           </div>
 
           {isSaving && (
-            <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium flex items-center gap-2 mr-4">
-              <Save size={16} />
+            <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium flex items-center gap-1.5 mr-4 animate-pulse">
+              <Save size={14} />
               Saving...
             </div>
           )}
 
           {activeUsers.length > 0 && (
-            <div className="px-3 py-2 bg-accent rounded-lg text-sm font-medium flex items-center gap-2 mr-4">
-              <Users size={16} />
+            <div className="px-3 py-1.5 bg-accent/50 rounded-full text-xs font-medium flex items-center gap-2 mr-4 text-muted-foreground">
+              <Users size={14} />
               <span>{activeUsers.length} active</span>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="relative">
               <button
                 onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-                className="px-4 py-2 border border-input rounded-lg hover:bg-accent flex items-center gap-2"
+                className="px-3 py-2 border border-input rounded-lg hover:bg-accent flex items-center gap-2 text-sm font-medium transition-colors"
               >
-                <Download size={18} />
+                <Download size={16} />
                 Export
               </button>
 
               {Boolean(exportMenuAnchor) && (
                 <div className="fixed inset-0 z-50" onClick={() => setExportMenuAnchor(null)}>
                   <div
-                    className="absolute bg-card border border-border rounded-lg shadow-xl w-48"
+                    className="absolute bg-card border border-border rounded-xl shadow-xl w-48 py-1 animate-in fade-in zoom-in-95 duration-100"
                     style={{
                       top: exportMenuAnchor.getBoundingClientRect().bottom + 8,
-                      left: exportMenuAnchor.getBoundingClientRect().left,
+                      left: exportMenuAnchor.getBoundingClientRect().left - 100,
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       onClick={() => handleExport("png")}
-                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm transition-colors"
                     >
                       Export as PNG
                     </button>
                     <button
                       onClick={() => handleExport("svg")}
-                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                      className="w-full px-4 py-2 text-left hover:bg-accent text-sm transition-colors"
                     >
                       Export as SVG
                     </button>
@@ -531,10 +531,10 @@ function WhiteboardPage() {
 
             <button
               onClick={() => setShareDialogOpen(true)}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-all shadow-sm hover:shadow-md flex items-center gap-2 text-sm font-medium"
             >
-              <Share2 size={18} />
-              Manage Access
+              <Share2 size={16} />
+              Share
             </button>
           </div>
         </div>
@@ -547,7 +547,7 @@ function WhiteboardPage() {
         boardTitle={boardTitle}
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative bg-muted/10">
         <Excalidraw
           excalidrawAPI={setExcalidrawApi}
           initialData={{
@@ -589,7 +589,7 @@ function WhiteboardPage() {
                   strokeLinejoin="round"
                 />
               </svg>
-              <div className="absolute top-5 left-5 px-2 py-1 bg-[#FF6B6B] text-white text-xs rounded-md whitespace-nowrap">
+              <div className="absolute top-5 left-5 px-2 py-1 bg-[#FF6B6B] text-white text-xs rounded-md whitespace-nowrap shadow-sm">
                 {cursor.userName}
               </div>
             </div>

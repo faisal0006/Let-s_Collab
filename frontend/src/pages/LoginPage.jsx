@@ -10,6 +10,7 @@ import {
   Moon,
   Loader2,
   AlertCircle,
+  ArrowLeft,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useThemeMode } from '../hooks/useThemeMode';
@@ -79,24 +80,28 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center bg-background py-8 relative">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-background to-background"></div>
+      <div className="absolute bottom-0 right-0 -z-10 w-1/2 h-1/2 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-secondary/5 via-background to-background"></div>
+
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
-        className="absolute top-4 right-4 p-3 hover:bg-accent rounded-lg transition-colors"
+        className="absolute top-4 right-4 p-3 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
       >
         {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
-      <div className="container mx-auto px-4 max-w-md">
-        <div className="bg-card border border-border rounded-2xl shadow-xl p-8 md:p-12">
+      <div className="w-full max-w-md space-y-8">
+        <div className="bg-card border border-border/50 rounded-3xl shadow-2xl shadow-primary/5 p-8 md:p-10 backdrop-blur-sm bg-card/95">
           {/* Logo/Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary mb-2">
-              Let's Collab 🎨
-            </h1>
-            <h2 className="text-2xl font-semibold mb-2">
-              {isSignUp ? 'Create Your Account' : 'Welcome Back'}
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4">
+              <span className="font-bold text-2xl">L</span>
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+              {isSignUp ? 'Create an account' : 'Welcome back'}
             </h2>
             <p className="text-sm text-muted-foreground">
               {isSignUp
@@ -107,10 +112,10 @@ function LoginPage() {
 
           {/* Error Alert */}
           {error && (
-            <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg flex items-start gap-3">
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
               <AlertCircle className="text-destructive shrink-0 mt-0.5" size={20} />
               <div className="flex-1">
-                <p className="text-sm text-destructive">{error}</p>
+                <p className="text-sm font-medium text-destructive">{error}</p>
               </div>
               <button
                 onClick={() => setError('')}
@@ -122,48 +127,48 @@ function LoginPage() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-foreground">Full Name</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2.5 border border-input bg-background rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                   />
                 </div>
               </div>
             )}
 
             {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Username</label>
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-foreground">Username</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
                     placeholder="johndoe"
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2.5 border border-input bg-background rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  3-30 characters: letters, numbers, dots, hyphens, underscores
+                <p className="text-xs text-muted-foreground ml-1">
+                  Letters, numbers, dots, hyphens, underscores
                 </p>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Email Address</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-foreground">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input
                   type="email"
                   value={email}
@@ -171,15 +176,15 @@ function LoginPage() {
                   placeholder="you@example.com"
                   required
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2.5 border border-input bg-background rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-foreground">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -187,14 +192,14 @@ function LoginPage() {
                   placeholder="••••••••"
                   required
                   autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                  className="w-full pl-10 pr-12 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-12 py-2.5 border border-input bg-background rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -202,10 +207,10 @@ function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 text-lg font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 text-base font-semibold bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
-                <Loader2 className="animate-spin" size={24} />
+                <Loader2 className="animate-spin" size={20} />
               ) : isSignUp ? (
                 'Create Account'
               ) : (
@@ -214,17 +219,19 @@ function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-border"></div>
-            <span className="text-sm text-muted-foreground">OR</span>
-            <div className="flex-1 h-px bg-border"></div>
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            </div>
           </div>
 
           {/* Google Sign In Button */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full py-4 text-lg border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-3"
+            className="w-full py-3 text-base font-medium border border-input bg-background hover:bg-accent text-foreground rounded-xl transition-colors flex items-center justify-center gap-3"
           >
             <svg width="20" height="20" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -233,23 +240,16 @@ function LoginPage() {
               <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
               <path fill="none" d="M0 0h48v48H0z"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>Google</span>
           </button>
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-border"></div>
-            <span className="text-sm text-muted-foreground">OR</span>
-            <div className="flex-1 h-px bg-border"></div>
-          </div>
-
           {/* Toggle Login/Signup */}
-          <div className="text-center">
+          <div className="text-center mt-8">
             <p className="text-sm text-muted-foreground">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <RouterLink
                 to={isSignUp ? '/login' : '/signup'}
-                className="font-semibold text-primary hover:underline"
+                className="font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
               </RouterLink>
@@ -260,9 +260,9 @@ function LoginPage() {
           <div className="text-center mt-6">
             <RouterLink
               to="/"
-              className="text-sm text-muted-foreground hover:underline"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              ← Back to Home
+              <ArrowLeft size={16} className="mr-1" /> Back to Home
             </RouterLink>
           </div>
         </div>

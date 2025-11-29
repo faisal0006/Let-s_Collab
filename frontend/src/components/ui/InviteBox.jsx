@@ -101,11 +101,11 @@ function InviteBox() {
         <div className="relative">
             <button
                 onClick={handleMenuOpen}
-                className="relative p-2 hover:bg-accent rounded-lg transition-colors"
+                className="relative p-2 hover:bg-primary/10 text-foreground/80 hover:text-primary rounded-full transition-all duration-300"
             >
                 <Mail size={20} />
                 {invites.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm animate-pulse">
                         {invites.length}
                     </span>
                 )}
@@ -114,71 +114,78 @@ function InviteBox() {
             {Boolean(anchorEl) && (
                 <div className="fixed inset-0 z-50" onClick={handleMenuClose}>
                     <div
-                        className="absolute right-4 top-16 bg-card border border-border rounded-lg shadow-xl w-96"
+                        className="absolute right-4 top-16 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl w-96 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                         style={{ maxHeight: "500px" }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="px-4 py-3 flex justify-between items-center border-b border-border">
-                            <h3 className="text-lg font-semibold">Invitations</h3>
+                        <div className="px-4 py-3 flex justify-between items-center border-b border-border/50 bg-muted/30">
+                            <h3 className="text-sm font-semibold text-foreground">Invitations</h3>
                             <button
                                 onClick={loadInvites}
                                 disabled={loading}
-                                className="p-1 hover:bg-accent rounded"
+                                className="p-1.5 hover:bg-background rounded-full text-muted-foreground hover:text-primary transition-colors"
                             >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : <RefreshCw size={20} />}
+                                {loading ? <Loader2 className="animate-spin" size={16} /> : <RefreshCw size={16} />}
                             </button>
                         </div>
 
                         {loading && invites.length === 0 ? (
-                            <div className="flex justify-center py-8">
-                                <Loader2 className="animate-spin text-primary" size={32} />
+                            <div className="flex justify-center py-12">
+                                <Loader2 className="animate-spin text-primary" size={24} />
                             </div>
                         ) : invites.length === 0 ? (
-                            <div className="text-center py-8 px-4">
-                                <Mail className="mx-auto text-muted-foreground mb-2" size={48} />
-                                <p className="text-sm text-muted-foreground">No new invitations</p>
+                            <div className="text-center py-12 px-4">
+                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                                    <Mail className="text-muted-foreground" size={24} />
+                                </div>
+                                <p className="text-sm font-medium text-foreground">No new invitations</p>
+                                <p className="text-xs text-muted-foreground mt-1">Check back later for new requests</p>
                             </div>
                         ) : (
-                            <div className="max-h-96 overflow-auto">
+                            <div className="max-h-96 overflow-auto custom-scrollbar">
                                 {invites.map((invite) => (
-                                    <div key={invite.id} className="border-b border-border last:border-0">
+                                    <div key={invite.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
                                         <div className="p-4 space-y-3">
                                             <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                                                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm border border-primary/20">
                                                     {invite.senderName?.charAt(0).toUpperCase() || "?"}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-semibold text-sm">{invite.senderName}</p>
+                                                    <p className="font-semibold text-sm text-foreground">{invite.senderName}</p>
                                                     <p className="text-xs text-muted-foreground mb-1">
                                                         invited you to collaborate on
                                                     </p>
-                                                    <div className="flex items-center gap-1 mb-1">
-                                                        <LayoutDashboard size={14} className="text-muted-foreground" />
-                                                        <p className="font-semibold text-sm truncate">
+                                                    <div className="flex items-center gap-1.5 mb-1.5 p-1.5 bg-background rounded border border-border/50">
+                                                        <LayoutDashboard size={14} className="text-primary" />
+                                                        <p className="font-medium text-xs truncate text-foreground">
                                                             {invite.boardTitle}
                                                         </p>
                                                     </div>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        as {invite.role.toLowerCase()} • {formatDate(invite.createdAt)}
+                                                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                        <span className="capitalize bg-secondary/10 text-secondary px-1.5 py-0.5 rounded text-[10px] font-medium">
+                                                            {invite.role.toLowerCase()}
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span>{formatDate(invite.createdAt)}</span>
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 pt-1">
                                                 <button
                                                     onClick={() => handleAcceptInvite(invite)}
                                                     disabled={processingInvite === invite.id}
-                                                    className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-1"
+                                                    className="flex-1 px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                                                 >
-                                                    <CheckCircle size={16} />
-                                                    {processingInvite === invite.id ? "..." : "Accept"}
+                                                    <CheckCircle size={14} />
+                                                    {processingInvite === invite.id ? "Joining..." : "Accept"}
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeclineInvite(invite)}
                                                     disabled={processingInvite === invite.id}
-                                                    className="flex-1 px-3 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive/10 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-1"
+                                                    className="flex-1 px-3 py-2 border border-border bg-background hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-foreground rounded-lg disabled:opacity-50 text-xs font-medium flex items-center justify-center gap-1.5 transition-all"
                                                 >
-                                                    <X size={16} />
+                                                    <X size={14} />
                                                     Decline
                                                 </button>
                                             </div>
