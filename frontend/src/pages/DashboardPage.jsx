@@ -17,6 +17,7 @@ import { whiteboardService } from "../services/index";
 import { useThemeMode } from '../hooks/useThemeMode';
 import { InviteBox } from '../components';
 import Logo from '../components/Logo';
+import { ProfileDropdown } from '../components/ui/ProfileDropdown';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -138,6 +139,10 @@ function DashboardPage() {
     navigate("/login");
   };
 
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -181,71 +186,13 @@ function DashboardPage() {
                   {user?.name?.charAt(0).toUpperCase() || "U"}
                 </button>
 
-                {Boolean(userMenuAnchor) && (
-                  <div className="fixed inset-0 z-50" onClick={() => setUserMenuAnchor(null)}>
-                    <div
-                      className="absolute right-4 top-16 bg-card border border-border rounded-xl shadow-xl w-72 animate-in fade-in zoom-in-95 duration-200"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {/* Profile Header */}
-                      <div className="p-4 border-b border-border/50 bg-muted/30 rounded-t-xl">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/60 rounded-full flex items-center justify-center text-lg font-bold text-primary-foreground shadow-inner">
-                            {user?.name?.charAt(0).toUpperCase() || "U"}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-foreground truncate">{user?.name || "User"}</h3>
-                            <p className="text-xs text-muted-foreground">Profile</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Profile Details */}
-                      <div className="p-4 space-y-4 border-b border-border/50">
-                        {/* Name */}
-                        <div>
-                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Name</p>
-                          <p className="text-sm font-medium text-foreground">{user?.name || "-"}</p>
-                        </div>
-
-                        {/* Username */}
-                        {user?.username && (
-                          <div>
-                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Username</p>
-                            <p className="text-sm font-medium text-foreground">{user.username}</p>
-                          </div>
-                        )}
-
-                        {/* Email */}
-                        <div>
-                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Email</p>
-                          <p className="text-sm font-medium text-foreground truncate">{user?.email || "-"}</p>
-                        </div>
-                      </div>
-
-                      {/* Menu Actions */}
-                      <div className="p-2 space-y-1">
-                        <button
-                          onClick={() => {
-                            setUserMenuAnchor(null);
-                            navigate('/profile');
-                          }}
-                          className="w-full px-4 py-2 text-left hover:bg-accent rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
-                        >
-                          <UserCircle size={16} />
-                          Edit Profile
-                        </button>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full px-4 py-2 text-left hover:bg-destructive/10 text-destructive rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
-                        >
-                          <LogOut size={16} />
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <ProfileDropdown
+                  user={user}
+                  onLogout={handleLogout}
+                  onUserUpdate={handleUserUpdate}
+                  anchor={userMenuAnchor}
+                  onClose={() => setUserMenuAnchor(null)}
+                />
               </div>
             </div>
           </div>

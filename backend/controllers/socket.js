@@ -60,8 +60,12 @@ const initializeSocket = (io) => {
           joinedAt: Date.now(),
         });
 
-        // Get list of active users for this board
-        const activeUsers = Array.from(boardUsers.values());
+        // Get list of active users for this board (unique by userId to prevent duplicates)
+        const uniqueUsers = new Map();
+        boardUsers.forEach((user) => {
+          uniqueUsers.set(user.userId, user);
+        });
+        const activeUsers = Array.from(uniqueUsers.values());
 
         // Notify all users in the board about the new user
         io.to(boardId).emit("user-joined", {
@@ -154,8 +158,12 @@ const initializeSocket = (io) => {
           if (boardUsers.size === 0) {
             boardRooms.delete(boardId);
           } else {
-            // Notify remaining users
-            const activeUsers = Array.from(boardUsers.values());
+            // Notify remaining users (unique by userId)
+            const uniqueUsers = new Map();
+            boardUsers.forEach((user) => {
+              uniqueUsers.set(user.userId, user);
+            });
+            const activeUsers = Array.from(uniqueUsers.values());
             io.to(boardId).emit("user-left", {
               userId,
               userName,
@@ -187,7 +195,12 @@ const initializeSocket = (io) => {
           if (boardUsers.size === 0) {
             boardRooms.delete(boardId);
           } else {
-            const activeUsers = Array.from(boardUsers.values());
+            // Get unique users by userId
+            const uniqueUsers = new Map();
+            boardUsers.forEach((user) => {
+              uniqueUsers.set(user.userId, user);
+            });
+            const activeUsers = Array.from(uniqueUsers.values());
             socket.to(boardId).emit("user-left", {
               userId,
               userName,

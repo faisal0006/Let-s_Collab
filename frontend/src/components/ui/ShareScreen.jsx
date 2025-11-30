@@ -29,7 +29,17 @@ function ShareScreen({ open, onClose, boardId, boardTitle }) {
             const boardResponse = await whiteboardService.getBoard(boardId, user.id);
             const board = boardResponse.response || boardResponse;
             setBoardData(board);
-            setCollaborators(board.collaborators || []);
+            
+            // Filter out any collaborators that might be duplicates
+            const uniqueCollaborators = [];
+            const seenUserIds = new Set();
+            (board.collaborators || []).forEach(collab => {
+                if (!seenUserIds.has(collab.userId)) {
+                    seenUserIds.add(collab.userId);
+                    uniqueCollaborators.push(collab);
+                }
+            });
+            setCollaborators(uniqueCollaborators);
 
             try {
                 const invitesResponse = await inviteService.getBoardInvites(

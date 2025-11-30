@@ -15,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
 import { ShareScreen } from "../components";
+import { ProfileDropdown } from "../components/ui/ProfileDropdown";
 import { io } from "socket.io-client";
 
 function WhiteboardPage() {
@@ -40,6 +41,8 @@ function WhiteboardPage() {
   const [lastSaved, setLastSaved] = useState(Date.now());
   const [activeUsers, setActiveUsers] = useState([]);
   const [cursors, setCursors] = useState({});
+  const [user, setUser] = useState(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -47,6 +50,7 @@ function WhiteboardPage() {
       navigate("/login");
       return;
     }
+    setUser(savedUser);
 
     const loadBoard = async () => {
       try {
@@ -410,6 +414,16 @@ function WhiteboardPage() {
     navigate("/dashboard");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   // Handle pointer move for cursor tracking
   const handlePointerUpdate = (payload) => {
     if (!socketRef.current) return;
@@ -536,6 +550,23 @@ function WhiteboardPage() {
               <Share2 size={16} />
               Share
             </button>
+
+            <div className="relative">
+              <button
+                onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                className="flex items-center justify-center w-9 h-9 bg-secondary text-secondary-foreground rounded-full font-semibold shadow-sm hover:shadow-md transition-all"
+              >
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </button>
+
+              <ProfileDropdown
+                user={user}
+                onLogout={handleLogout}
+                onUserUpdate={handleUserUpdate}
+                anchor={userMenuAnchor}
+                onClose={() => setUserMenuAnchor(null)}
+              />
+            </div>
           </div>
         </div>
       </header>
