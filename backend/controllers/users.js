@@ -54,19 +54,33 @@ async function updateProfile(req, res) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { name, username } = req.body;
+    const { name, username, email } = req.body;
 
-    if (!name || name.trim() === "") {
-      return res.status(400).json({ error: "Name is required" });
+    // Debug logging
+    console.log("📝 Update Profile Request:", { name, username, email });
+
+    // Check if at least one field is being updated
+    if (name === undefined && username === undefined && email === undefined) {
+      return res.status(400).json({ error: "At least one field (name, username, or email) is required" });
     }
 
-    const updateData = {
-      name: name.trim(),
-    };
+    const updateData = {};
 
-    // If username is provided, validate and check uniqueness
-    if (username && username.trim() !== "") {
+    // Update name if provided
+    if (name !== undefined) {
+      if (name.trim() === "") {
+        return res.status(400).json({ error: "Name cannot be empty" });
+      }
+      updateData.name = name.trim();
+    }
+
+    // Update username if provided
+    if (username !== undefined) {
       const usernameValue = username.trim().toLowerCase();
+      
+      if (usernameValue === "") {
+        return res.status(400).json({ error: "Username cannot be empty" });
+      }
       
       // Validate username format
       const usernameRegex = /^[a-z0-9._-]+$/;
@@ -100,6 +114,34 @@ async function updateProfile(req, res) {
       updateData.username = usernameValue;
     }
 
+    // Update email if provided
+    if (email !== undefined) {
+      const emailValue = email.trim().toLowerCase();
+      
+      if (emailValue === "") {
+        return res.status(400).json({ error: "Email cannot be empty" });
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailValue)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      // Check if email is already taken by another user
+      const existingUser = await prisma.user.findUnique({
+        where: { email: emailValue },
+      });
+
+      if (existingUser && existingUser.id !== decoded.id) {
+        return res.status(400).json({ error: "Email is already taken" });
+      }
+
+      updateData.email = emailValue;
+    }
+
+    console.log("✅ Updating user with data:", updateData);
+
     const user = await prisma.user.update({
       where: { id: decoded.id },
       data: updateData,
@@ -114,9 +156,11 @@ async function updateProfile(req, res) {
       },
     });
 
+    console.log("✅ User updated successfully:", user.username || user.email);
+
     res.json({ success: true, user, message: "Profile updated successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error updating profile:", err);
     res.status(500).json({ error: "Server error" });
   }
 }
