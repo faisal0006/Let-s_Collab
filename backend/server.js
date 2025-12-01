@@ -14,13 +14,19 @@ const app = express();
 const httpServer = createServer(app);
 const PORT = 3000;
 
-// Initialize Socket.IO with CORS
+// Initialize Socket.IO with CORS and performance optimizations
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST"],
   },
+  // Performance optimizations
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 30000,
+  maxHttpBufferSize: 1e7, // 10MB max message size
+  transports: ['websocket', 'polling'], // Prefer websocket
 });
 
 // Middleware

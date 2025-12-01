@@ -30,7 +30,9 @@ function WhiteboardPage() {
   const applyingRemoteUpdate = useRef(false);
   const lastSerializedElementsRef = useRef("");
   const lastSavedSerializedRef = useRef("");
-  const lastChangeTimeRef = useRef(Date.now());
+  const lastSocketEmitRef = useRef(Date.now());
+  const socketEmitTimeoutRef = useRef(null);
+  const saveTimeoutRef = useRef(null);
   const [boardTitle, setBoardTitle] = useState("Untitled Board");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState("");
@@ -68,14 +70,17 @@ function WhiteboardPage() {
 
     loadBoard();
 
-    // Initialize Socket.IO connection
+    // Initialize Socket.IO connection with performance optimizations
     const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     socketRef.current = io(BACKEND_URL, {
       withCredentials: true,
-      transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
+      transports: ["websocket", "polling"], // Prefer websocket for lower latency
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
+      timeout: 20000,
+      upgrade: true,
+      rememberUpgrade: true,
     });
 
     // Connection status handlers
@@ -133,13 +138,21 @@ function WhiteboardPage() {
     // Listen for element updates from other users
     socketRef.current.on("element-update", (data) => {
       if (data.userId !== savedUser.id && excalidrawRef.current) {
+        // Set flag before update
         applyingRemoteUpdate.current = true;
-        excalidrawRef.current.updateScene({
-          elements: data.elements,
-        });
-        requestAnimationFrame(() => {
+        
+        try {
+          excalidrawRef.current.updateScene({
+            elements: data.elements,
+          });
+        } catch (error) {
+          console.error("Error updating scene:", error);
+        }
+        
+        // Clear flag after a short delay to ensure update is complete
+        setTimeout(() => {
           applyingRemoteUpdate.current = false;
-        });
+        }, 100);
       }
     });
 
@@ -174,6 +187,12 @@ function WhiteboardPage() {
 
     // Cleanup on unmount
     return () => {
+      if (socketEmitTimeoutRef.current) {
+        clearTimeout(socketEmitTimeoutRef.current);
+      }
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
       if (socketRef.current) {
         socketRef.current.emit("leave-board");
         socketRef.current.disconnect();
@@ -198,18 +217,14 @@ function WhiteboardPage() {
   const handleChange = (elements) => {
     if (!excalidrawRef.current) return;
 
+    // Skip if this is a remote update being applied
     if (applyingRemoteUpdate.current) {
-      applyingRemoteUpdate.current = false;
       return;
     }
 
-    // Throttle: Only trigger save state update if enough time has passed
     const now = Date.now();
-    if (now - lastChangeTimeRef.current < 300) {
-      return;
-    }
-    lastChangeTimeRef.current = now;
-
+    
+    // Serialize current elements
     let serialized;
     try {
       serialized = JSON.stringify(elements || []);
@@ -217,35 +232,45 @@ function WhiteboardPage() {
       serialized = null;
     }
 
+    // Skip if no change detected
     if (serialized && serialized === lastSerializedElementsRef.current) {
       return;
     }
 
     if (serialized) lastSerializedElementsRef.current = serialized;
 
-    if (
-      serialized &&
-      boardData?.elements &&
-      Array.isArray(boardData.elements)
-    ) {
-      try {
-        if (JSON.stringify(boardData.elements) === serialized) {
-          return;
-        }
-      } catch {
-        // Ignore serialization errors
-      }
-    }
-
-    // Emit real-time update to other users
-    if (socketRef.current && elements) {
+    // Throttled socket emission (every 150ms max)
+    if (socketRef.current && elements && (now - lastSocketEmitRef.current) >= 150) {
+      lastSocketEmitRef.current = now;
       const savedUser = JSON.parse(localStorage.getItem("user") || "null");
       socketRef.current.emit("element-update", {
         boardId: id,
         elements: elements,
         userId: savedUser?.id,
       });
+    } else if (socketRef.current && elements) {
+      // If throttled, schedule an emit for later
+      if (socketEmitTimeoutRef.current) {
+        clearTimeout(socketEmitTimeoutRef.current);
+      }
+      socketEmitTimeoutRef.current = setTimeout(() => {
+        const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+        socketRef.current.emit("element-update", {
+          boardId: id,
+          elements: elements,
+          userId: savedUser?.id,
+        });
+        lastSocketEmitRef.current = Date.now();
+      }, 150);
     }
+
+    // Debounce backend save (only save after 2 seconds of inactivity)
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToBackend();
+    }, 2000);
 
     setLastSaved(Date.now());
   };

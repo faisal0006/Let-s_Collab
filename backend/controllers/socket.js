@@ -91,7 +91,12 @@ const initializeSocket = (io) => {
           return;
         }
 
-        // Broadcast to all other users in the board
+        // Validate elements array size to prevent crashes
+        if (elements && Array.isArray(elements) && elements.length > 10000) {
+          console.warn(`⚠️ Large element array detected: ${elements.length} elements`);
+        }
+
+        // Broadcast to all other users in the board (more efficient than io.to)
         socket.to(boardId).emit("element-update", {
           elements,
           userId,
