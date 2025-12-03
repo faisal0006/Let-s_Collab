@@ -4,7 +4,6 @@ import { ProtectedRoute } from './components';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
-import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
 import WhiteboardPage from './pages/WhiteboardPage';
 
@@ -16,14 +15,6 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/dashboard"
           element={

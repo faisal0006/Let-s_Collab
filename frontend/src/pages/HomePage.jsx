@@ -14,11 +14,14 @@ import {
 } from 'lucide-react';
 import { useThemeMode } from '../hooks/useThemeMode';
 import Logo from '../components/Logo';
+import { ProfileDropdown } from '../components/ui/ProfileDropdown';
+import toast from 'react-hot-toast';
 
 function HomePage() {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useThemeMode();
   const [user, setUser] = useState(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -66,6 +69,18 @@ function HomePage() {
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setUserMenuAnchor(null);
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/30">
       {/* Navigation */}
@@ -90,13 +105,22 @@ function HomePage() {
                   <span className="hidden sm:inline text-sm text-muted-foreground">
                     Welcome, {user.name || user.username || user.email}
                   </span>
-                  <button
-                    onClick={() => navigate('/profile')}
-                    className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
-                    title="Profile"
-                  >
-                    <UserCircle size={20} />
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                      className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                      title="Profile"
+                    >
+                      <UserCircle size={20} />
+                    </button>
+                    <ProfileDropdown
+                      user={user}
+                      onLogout={handleLogout}
+                      onUserUpdate={handleUserUpdate}
+                      anchor={userMenuAnchor}
+                      onClose={() => setUserMenuAnchor(null)}
+                    />
+                  </div>
                   <button
                     onClick={() => navigate('/dashboard')}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
