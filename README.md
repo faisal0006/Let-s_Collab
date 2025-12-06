@@ -5,227 +5,169 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-## 📋 Table of Contents
+---
 
-- [Overview](#overview)
-- [Core Features](#core-features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Development Roadmap](#development-roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+### 📚 **[Setup Guide](SETUP.md)** · **[Contributing](CONTRIBUTING.md)** · **[API Docs](API.md)**
 
-<a id="overview"></a>
-## 🎯 Overview
+---
+
+## 🎯 What is Let's Collab?
 
 **Let's Collab** is a real-time collaborative whiteboard platform where users can create, organize, and share multiple whiteboards. Each board supports live drawing, sticky notes, shapes, text, and media — all synced instantly for every collaborator.
 
-### Use Cases
+Perfect for remote teams, classrooms, designers, and anyone who needs a shared visual workspace.
 
-- 🧑‍💼 **Team Brainstorming** - Remote teams collaborating on ideas
-- 🎓 **Classroom Collaboration** - Teachers and students working together
-- 🎨 **UI Design Sketches** - Quick wireframing and design collaboration
-- 📊 **Project Planning** - Visual project management and workflows
-- 💡 **Creative Workshops** - Real-time creative sessions
+## ✨ Key Features
 
-<a id="core-features"></a>
-## ✨ Core Features 
+### 🔐 Authentication & User Management
+- Email/password and OAuth (Google) authentication
+- JWT-based secure sessions
+- User profiles with customizable avatars
 
-### 1. 🔐 User Accounts & Authentication
+### 📊 Whiteboard Management
+- Create unlimited whiteboards
+- Rename, delete, and organize boards
+- Dashboard with board previews
+- Quick search and filtering
 
-- Sign up / Login (Email, Google, GitHub)
-- Password reset functionality
-- User profile with avatar and display name
-- Secure JWT-based authentication
+### 🤝 Real-time Collaboration
+- **Live sync** across all collaborators using Socket.IO
+- **Permission levels**: Viewer, Editor, Owner
+- **Invite collaborators** by username or email with role selection
+- **Live cursors** showing collaborator positions and names
+- **Presence indicators** for active users
 
-### 2. 📊 Whiteboard Management
+### 🎨 Drawing & Design Tools
+- Full-featured drawing powered by Excalidraw
+- Shapes, lines, arrows, text, and sticky notes
+- Color picker with custom palettes
+- Undo/redo support
+- Zoom and pan controls
+- Export to PNG and SVG formats
 
-- Create multiple whiteboards
-- Rename / Delete whiteboards
-- Organize boards into folders (optional, later phase)
-- Thumbnail previews of boards on dashboard
-- Quick search and filter boards
-
-### 3. 🤝 Collaboration
-
-- **Invite Collaborators** via email or shareable link
-- **Permission Levels:**
-  - 👁️ Viewer (read-only access)
-  - ✏️ Editor (can edit and draw)
-  - 👑 Owner (full control)
-- Real-time sync using Socket.IO
-- Presence indicators showing active collaborators' cursors and names
-- Live cursor tracking with user names
-
-### 4. 🎨 Drawing Tools
-
-- **Pen/Brush** with customizable color and thickness
-- **Shapes**: Rectangle, Circle, Line, Arrow
-- **Eraser** tool
-- **Undo/Redo** functionality
-- **Zoom in/out** and pan
-- **Text boxes** with formatting options
-- **Sticky notes** for quick annotations
-- Color picker with preset palettes
-
-### 5. 💾 Saving & Persistence
-
-- Auto-save board content to the cloud
-- Real-time data synchronization
-- Version history (restore previous states)
+### 💾 Data Persistence
+- Auto-save functionality
+- Real-time synchronization
 - Conflict resolution for simultaneous edits
+- Persistent storage with MySQL
 
-
-### 💾 Export & Integration
-
-#### Export Options
-- Export boards as PNG, PDF, or SVG
-- Batch export multiple boards
-
-#### Integrations
-- **Cloud Storage**: Google Drive integration
-- **Productivity**: Notion, Slack notifications
-- **Video Conferencing**: Zoom, Microsoft Teams
-- **Developer Tools**: GitHub for dev brainstorming
-- **API Access**: RESTful API for custom integrations
-
-<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: React with Vite
-- **Canvas Library**: Excalidraw (for drawing and whiteboard functionality)
-- **State Management**: Zustand
-- **Styling**: CSS3
-- **Real-time**: Socket.IO Client
+- **React** (v18) with **Vite** - Fast, modern development
+- **Excalidraw** - Professional whiteboard canvas
+- **Zustand** - Lightweight state management
+- **TailwindCSS** & **Shadcn/ui** - Modern, responsive design
+- **Socket.IO Client** - Real-time communication
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MySQL with Prisma ORM
-- **Real-time**: Socket.IO
-- **Authentication**: JWT (JSON Web Tokens)
+- **Node.js** with **Express.js** - RESTful API
+- **MySQL** with **Prisma ORM** - Type-safe database access
+- **Socket.IO** - WebSocket-based real-time sync
+- **Passport.js** - Authentication strategies
+- **JWT** - Secure token-based auth
 
 ### Infrastructure
-- **File Storage**: Firebase / Supabase
-- **Hosting**: Vercel (Frontend) / Railway (Backend)
-- **Database Hosting**: PlanetScale / Railway / Supabase
+- **Vercel** - Frontend hosting
+- **Railway** - Backend and database hosting
+- **GitHub Actions** - CI/CD pipelines
 
+## 🚀 Quick Start
 
-<a id="getting-started"></a>
-## 🚀 Getting Started
-<a id="project-structure"></a>
-## Project Structure
-
-The repo is split into `backend/` and `frontend/` directories. See the folders for server, routes, controllers, and the React frontend with Vite.
-
-<a id="development-roadmap"></a>
-## Development Roadmap
-
-Planned milestones include collaborative cursors, version history, team folders, and SSO integrations.
-
-
-### Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Node.js** (v18.x or higher)
-- **npm** or **yarn** or **pnpm**
-- **MySQL** (v8.x or higher)
-- **Git**
-
-### Installation
-
-1. **Clone the repository**
+Get up and running in 5 minutes:
 
 ```bash
+# Clone the repository
 git clone https://github.com/IronwallxR5/Let-s_Collab.git
 cd Let-s_Collab
-```
 
-2. **Install dependencies**
+# Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
 
-```bash
-# Install backend dependencies
+# Set up environment variables (see SETUP.md)
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Run database migrations
 cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
-
-3. **Environment Setup**
-
-Create `.env` files in both frontend and backend directories:
-
-
-
-4. **Database Setup**
-
-```bash
-cd backend
-
-# Generate Prisma Client
-npx prisma generate
-
-# Run migrations
 npx prisma migrate dev
 
-# (Optional) Seed database
-npm run seed
+# Start the application
+# Terminal 1 - Backend
+cd backend && npm run dev
+
+# Terminal 2 - Frontend  
+cd frontend && npm run dev
 ```
 
-5. **Run the application**
+**For detailed setup instructions, see [SETUP.md](SETUP.md)**
 
-```bash
-# Terminal 1 - Start backend
-cd backend
-npm run dev
+## 📸 Screenshots
 
-# Terminal 2 - Start frontend
-cd frontend
-npm run dev
+### Dashboard
+Manage all your whiteboards in one place with an intuitive interface.
+
+### Whiteboard Editor
+Collaborate in real-time with a full suite of drawing tools.
+
+### Collaboration
+See live cursors and invite team members with different permission levels.
+
+## 📁 Project Structure
+
+```
+Let-s_Collab/
+├── backend/              # Node.js + Express API
+│   ├── config/          # Configuration files
+│   ├── controllers/     # Route controllers
+│   ├── middleware/      # Custom middleware
+│   ├── prisma/          # Database schema & migrations
+│   ├── routes/          # API routes
+│   └── utils/           # Helper functions
+├── frontend/            # React + Vite app
+│   ├── src/
+│   │   ├── components/  # Reusable UI components
+│   │   ├── contexts/    # React contexts
+│   │   ├── features/    # Feature modules
+│   │   ├── pages/       # Route pages
+│   │   ├── services/    # API services
+│   │   └── store/       # State management
+│   └── public/          # Static assets
+├── SETUP.md             # Setup instructions
+├── CONTRIBUTING.md      # Contribution guidelines
+└── README.md            # This file
 ```
 
-
-<a id="contributing"></a>
 ## 🤝 Contributing
 
-We welcome contributions from the community! Here's how you can help:
+We love contributions! Whether it's bug reports, feature requests, or code contributions, we welcome them all.
 
-<a id="contributing-getting-started"></a>
-### Getting Started
+**See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.**
 
+Quick contribution steps:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Contribution Guidelines
-
-- Follow the existing code style and conventions
-- Write clear commit messages
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting PR
-
-### Code of Conduct
-
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
-
-<a id="license"></a>
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
+## 🙏 Acknowledgments
+
+- [Excalidraw](https://excalidraw.com/) - Amazing whiteboard library
+- [Socket.IO](https://socket.io/) - Real-time engine
+- [Prisma](https://www.prisma.io/) - Next-generation ORM
+- All our [contributors](https://github.com/IronwallxR5/Let-s_Collab/graphs/contributors)
 
 ---
 
 <div align="center">
-  Made with ❤️ by the Let's Collab Team
+  <p>Made with ❤️ by the Let's Collab Team</p>
+  <p>⭐ Star us on GitHub — it helps!</p>
   
-  ⭐ Star us on GitHub — it helps!
+  [Website](https://let-s-collab.vercel.app) • [Report Bug](https://github.com/IronwallxR5/Let-s_Collab/issues) • [Request Feature](https://github.com/IronwallxR5/Let-s_Collab/issues)
 </div>
