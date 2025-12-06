@@ -7,10 +7,6 @@
 
 ---
 
-### 📚 **[Setup Guide](SETUP.md)** · **[Contributing](CONTRIBUTING.md)** · **[API Docs](API.md)**
-
----
-
 ## 🎯 What is Let's Collab?
 
 **Let's Collab** is a real-time collaborative whiteboard platform where users can create, organize, and share multiple whiteboards. Each board supports live drawing, sticky notes, shapes, text, and media — all synced instantly for every collaborator.

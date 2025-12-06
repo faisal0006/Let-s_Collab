@@ -4,10 +4,6 @@ Complete installation and configuration guide for Let's Collab.
 
 ---
 
-### 📚 **[← Back to README](README.md)** · **[Contributing](CONTRIBUTING.md)** · **[API Docs](API.md)**
-
----
-
 ## Prerequisites
 
 - **Node.js** (v18.x or higher)

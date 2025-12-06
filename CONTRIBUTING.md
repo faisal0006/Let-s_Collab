@@ -4,10 +4,6 @@ Thank you for your interest in contributing! We welcome contributions from devel
 
 ---
 
-### 📚 **[← Back to README](README.md)** · **[Setup Guide](SETUP.md)** · **[API Docs](API.md)**
-
----
-
 ## Code of Conduct
 
 Be respectful, inclusive, and professional in all interactions. No harassment, trolling, or offensive behavior will be tolerated.
