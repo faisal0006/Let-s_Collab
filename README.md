@@ -62,6 +62,7 @@ Perfect for remote teams, classrooms, designers, and anyone who needs a shared v
 - **Socket.IO** - WebSocket-based real-time sync
 - **Passport.js** - Authentication strategies
 - **JWT** - Secure token-based auth
+- **Redis** - Optional in-memory caching for 10-100x faster response times
 
 ### Infrastructure
 - **Vercel** - Frontend hosting

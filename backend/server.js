@@ -9,6 +9,7 @@ const route = require("./routes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { initializeSocket } = require("./controllers/socket");
+const { initRedis } = require("./config/redis");
 
 const app = express();
 const httpServer = createServer(app);
@@ -68,6 +69,13 @@ app.use("/", route);
 
 // Initialize Socket.IO handlers
 initializeSocket(io);
+
+// Initialize Redis cache
+initRedis().then(() => {
+  console.log('Redis initialization complete');
+}).catch(err => {
+  console.error('Redis initialization failed:', err.message);
+});
 
 httpServer.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

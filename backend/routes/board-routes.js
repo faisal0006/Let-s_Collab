@@ -6,18 +6,23 @@ const {
   createBoard,
   updateBoard
 } = require("../controllers/boards");
+const { cacheMiddleware, invalidateCache } = require("../middleware/cache");
 
 const router = express.Router();
 
-// getting all boards of a specific user
-router.get("/", getAllBoards);
+// getting all boards of a specific user (cached for 5 minutes)
+router.get("/", cacheMiddleware("boards:user", 300), getAllBoards);
 
-// getting boards by a specific id
-router.get("/:id", getBoardById);
+// getting boards by a specific id (cached for 5 minutes)
+router.get("/:id", cacheMiddleware("board:id", 300), getBoardById);
 
-// delete board (owner only)
-router.delete("/:id", deleteBoard);
-router.post("/", createBoard);
-router.patch("/:id",updateBoard)
+// delete board (owner only) - invalidate cache
+router.delete("/:id", invalidateCache(["board:id:*", "boards:user:*"]), deleteBoard);
+
+// create board - invalidate cache
+router.post("/", invalidateCache(["boards:user:*"]), createBoard);
+
+// update board - invalidate cache
+router.patch("/:id", invalidateCache(["board:id:*", "boards:user:*"]), updateBoard);
 
 module.exports = router;
