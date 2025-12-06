@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -390,24 +390,37 @@ function WhiteboardPage() {
 
     const elements = excalidrawRef.current.getSceneElements();
     const appState = excalidrawRef.current.getAppState();
+    const files = excalidrawRef.current.getFiles();
 
     try {
       if (type === "png") {
-        const blob = await excalidrawRef.current.exportToBlob({
+        const blob = await exportToBlob({
           elements,
-          appState,
+          appState: {
+            ...appState,
+            exportBackground: true,
+            exportWithDarkMode: false,
+          },
+          files,
           mimeType: "image/png",
+          quality: 1,
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = `${boardTitle}.png`;
         a.click();
+        URL.revokeObjectURL(url);
         toast.success("Exported as PNG");
       } else if (type === "svg") {
-        const svg = await excalidrawRef.current.exportToSvg({
+        const svg = await exportToSvg({
           elements,
-          appState,
+          appState: {
+            ...appState,
+            exportBackground: true,
+            exportWithDarkMode: false,
+          },
+          files,
         });
         const svgString = new XMLSerializer().serializeToString(svg);
         const blob = new Blob([svgString], { type: "image/svg+xml" });
@@ -416,6 +429,7 @@ function WhiteboardPage() {
         a.href = url;
         a.download = `${boardTitle}.svg`;
         a.click();
+        URL.revokeObjectURL(url);
         toast.success("Exported as SVG");
       }
     } catch (err) {

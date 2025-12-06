@@ -14,10 +14,18 @@ const app = express();
 const httpServer = createServer(app);
 const PORT = 3000;
 
+// Configure allowed origins for CORS
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://let-s-collab.vercel.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 // Initialize Socket.IO with CORS and performance optimizations
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -32,7 +40,7 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
