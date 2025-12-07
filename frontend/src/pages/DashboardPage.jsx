@@ -32,6 +32,7 @@ function DashboardPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -73,6 +74,15 @@ function DashboardPage() {
       setFilteredBoards(filtered);
     }
   }, [searchQuery, whiteboards]);
+
+  // Update timestamps every minute for dynamic "x minutes ago" display
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const createNewWhiteboard = async () => {
     try {
@@ -150,12 +160,15 @@ function DashboardPage() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now - date;
+    const now = currentTime; // Use currentTime state instead of Date.now()
+    const diffInMs = now - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffInHours < 1) return "Just now";
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60)
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     if (diffInHours < 24)
       return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
     if (diffInDays === 1) return "Yesterday";
