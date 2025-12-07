@@ -23,6 +23,7 @@ function HomePage() {
   const { mode, toggleTheme } = useThemeMode();
   const [user, setUser] = useState(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
@@ -177,10 +178,23 @@ function HomePage() {
                 </div>
               ) : (
                 <button
-                  onClick={() => navigate('/dashboard')}
-                  className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 mx-auto hover:-translate-y-1"
+                  onClick={() => {
+                    setIsNavigating(true);
+                    navigate('/dashboard');
+                  }}
+                  disabled={isNavigating}
+                  className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 mx-auto hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Go to Your Whiteboards <ArrowRight size={20} />
+                  {isNavigating ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      Go to Your Whiteboards <ArrowRight size={20} />
+                    </>
+                  )}
                 </button>
               )}
             </div>

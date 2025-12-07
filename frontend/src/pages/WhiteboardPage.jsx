@@ -45,6 +45,7 @@ function WhiteboardPage() {
   const [cursors, setCursors] = useState({});
   const [user, setUser] = useState(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -56,11 +57,14 @@ function WhiteboardPage() {
 
     const loadBoard = async () => {
       try {
+        setIsLoading(true);
         const response = await whiteboardService.getBoard(id, savedUser.id);
         const data = response.response || response;
         setBoardTitle(data.title);
         setTempTitle(data.title);
         setBoardData(data);
+        // Small delay to ensure Excalidraw is ready
+        setTimeout(() => setIsLoading(false), 300);
       } catch (error) {
         console.error("Error loading board:", error);
         toast.error("Failed to load whiteboard");
@@ -275,6 +279,43 @@ function WhiteboardPage() {
     setLastSaved(Date.now());
   };
 
+  const generateThumbnail = async () => {
+    if (!excalidrawRef.current) return null;
+
+    try {
+      const elements = excalidrawRef.current.getSceneElements();
+      const appState = excalidrawRef.current.getAppState();
+      const files = excalidrawRef.current.getFiles();
+
+      // Only generate thumbnail if there are elements
+      if (!elements || elements.length === 0) {
+        return null;
+      }
+
+      const blob = await exportToBlob({
+        elements,
+        appState: {
+          ...appState,
+          exportBackground: true,
+          exportWithDarkMode: false,
+        },
+        files,
+        mimeType: "image/png",
+        quality: 0.7,
+        maxWidthOrHeight: 400, // Generate smaller thumbnail for performance
+      });
+
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+      return null;
+    }
+  };
+
   const saveToBackend = React.useCallback(async () => {
     if (!excalidrawRef.current) return;
 
@@ -300,8 +341,12 @@ function WhiteboardPage() {
         return;
       }
 
+      // Generate thumbnail
+      const thumbnail = await generateThumbnail();
+
       await whiteboardService.updateBoard(id, savedUser.id, {
         elements: elements,
+        thumbnail: thumbnail,
       });
 
       if (serialized) lastSavedSerializedRef.current = serialized;
@@ -618,15 +663,25 @@ function WhiteboardPage() {
       />
 
       <div className="flex-1 overflow-hidden relative bg-muted/10">
-        <Excalidraw
-          excalidrawAPI={setExcalidrawApi}
-          initialData={{
-            elements: [],
-            appState: { viewBackgroundColor: "#ffffff" },
-          }}
-          onChange={handleChange}
-          onPointerUpdate={handlePointerUpdate}
-        />
+        {isLoading ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background">
+            <div className="relative mb-6">
+              <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Loading Whiteboard</h3>
+            <p className="text-sm text-muted-foreground">Please wait...</p>
+          </div>
+        ) : (
+          <Excalidraw
+            excalidrawAPI={setExcalidrawApi}
+            initialData={{
+              elements: [],
+              appState: { viewBackgroundColor: "#ffffff" },
+            }}
+            onChange={handleChange}
+            onPointerUpdate={handlePointerUpdate}
+          />
+        )}
       </div>
 
       {/* Remote cursors overlay */}

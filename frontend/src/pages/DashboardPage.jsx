@@ -31,6 +31,7 @@ function DashboardPage() {
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -42,6 +43,7 @@ function DashboardPage() {
 
     const loadBoards = async () => {
       try {
+        setIsLoading(true);
         const data = await whiteboardService.getAllBoards(savedUser.id);
 
         if (data?.response) {
@@ -53,6 +55,8 @@ function DashboardPage() {
         toast.error("Failed to load whiteboards");
         setWhiteboards([]);
         setFilteredBoards([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -212,19 +216,37 @@ function DashboardPage() {
             </p>
           </div>
 
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <input
-              type="text"
-              placeholder="Search boards..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-input bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm text-sm"
-            />
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <input
+                type="text"
+                placeholder="Search boards..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-input bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm text-sm"
+              />
+            </div>
+            <button
+              onClick={createNewWhiteboard}
+              className="px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 inline-flex items-center gap-2 font-medium whitespace-nowrap"
+              title="Create new whiteboard"
+            >
+              <Plus size={20} />
+              <span className="hidden sm:inline">New Board</span>
+            </button>
           </div>
         </div>
 
-        {filteredBoards.length === 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="relative mb-6">
+              <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Loading Whiteboards</h3>
+            <p className="text-sm text-muted-foreground">Please wait...</p>
+          </div>
+        ) : filteredBoards.length === 0 ? (
           <div className="text-center py-24 bg-card border border-border/50 rounded-3xl border-dashed">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
               <FolderOpen size={40} className="text-muted-foreground" />
@@ -259,22 +281,36 @@ function DashboardPage() {
                       className="cursor-pointer"
                     >
                       <div className="h-40 bg-muted/30 flex items-center justify-center border-b border-border/50 relative overflow-hidden group-hover:bg-muted/50 transition-colors">
-                        {/* Placeholder Preview */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
-                          <svg
-                            viewBox="0 0 100 100"
-                            className="w-1/2 h-1/2 text-muted-foreground/30"
-                            fill="currentColor"
-                          >
-                            <rect x="20" y="20" width="60" height="40" rx="4" />
-                            <circle cx="70" cy="30" r="5" />
-                            <rect x="30" y="35" width="30" height="4" rx="2" />
-                            <rect x="30" y="45" width="40" height="4" rx="2" />
-                          </svg>
-                        </div>
-
-                        {/* Overlay on hover */}
-                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+                        {board.thumbnail ? (
+                          <>
+                            {/* Actual Board Thumbnail */}
+                            <img
+                              src={board.thumbnail}
+                              alt={board.title}
+                              className="w-full h-full object-cover"
+                            />
+                            {/* Overlay on hover */}
+                            <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Placeholder Preview */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
+                              <svg
+                                viewBox="0 0 100 100"
+                                className="w-1/2 h-1/2 text-muted-foreground/30"
+                                fill="currentColor"
+                              >
+                                <rect x="20" y="20" width="60" height="40" rx="4" />
+                                <circle cx="70" cy="30" r="5" />
+                                <rect x="30" y="35" width="30" height="4" rx="2" />
+                                <rect x="30" y="45" width="40" height="4" rx="2" />
+                              </svg>
+                            </div>
+                            {/* Overlay on hover */}
+                            <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+                          </>
+                        )}
                       </div>
 
                       <div className="p-4">
