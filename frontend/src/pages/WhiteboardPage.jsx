@@ -675,7 +675,7 @@ function WhiteboardPage() {
           <Excalidraw
             excalidrawAPI={setExcalidrawApi}
             initialData={{
-              elements: [],
+              elements: boardData?.elements || [],
               appState: { viewBackgroundColor: "#ffffff" },
             }}
             onChange={handleChange}
