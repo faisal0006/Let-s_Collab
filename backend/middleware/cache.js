@@ -75,9 +75,9 @@ const invalidateCache = (patterns) => {
           for (const pattern of patterns) {
             // Replace placeholders with actual values from req.params/user
             let cachePattern = pattern
-              .replace(':id', req.params.id || '*')
-              .replace(':boardId', req.params.boardId || '*')
-              .replace(':userId', userId || req.body.userId || req.params.userId || '*');
+              .replace(':id', req.params?.id || '*')
+              .replace(':boardId', req.params?.boardId || '*')
+              .replace(':userId', userId || req.body?.userId || req.params?.userId || req.query?.userId || '*');
             
             await cache.delPattern(cachePattern);
             console.log(`🗑️  Cache invalidated: ${cachePattern}`);

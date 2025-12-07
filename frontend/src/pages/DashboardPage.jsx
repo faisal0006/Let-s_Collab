@@ -11,6 +11,7 @@ import {
   FolderOpen,
   Sun,
   Moon,
+  Menu,
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
@@ -160,72 +161,65 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
               <Logo className="w-10 h-10" />
-              <h1 className="text-lg font-semibold tracking-tight">Let's Collab</h1>
+              <h1 className="text-xl font-bold tracking-tight text-foreground">
+                Let's Collab
+              </h1>
             </div>
-
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 onClick={toggleTheme}
                 className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
               >
                 {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-
-              <InviteBox />
-
-              <div className="relative">
-                <button
-                  onClick={(e) => setUserMenuAnchor(e.currentTarget)}
-                  className="flex items-center justify-center w-9 h-9 bg-secondary text-secondary-foreground rounded-full font-semibold shadow-sm hover:shadow-md transition-all"
-                >
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </button>
-
-                <ProfileDropdown
-                  user={user}
-                  onLogout={handleLogout}
-                  onUserUpdate={handleUserUpdate}
-                  anchor={userMenuAnchor}
-                  onClose={() => setUserMenuAnchor(null)}
-                />
-              </div>
+              {user && (
+                <div className="relative">
+                  <button
+                    onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                    className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                    title="Profile"
+                  >
+                    <UserCircle size={20} />
+                  </button>
+                  <ProfileDropdown
+                    user={user}
+                    onLogout={handleLogout}
+                    onUserUpdate={handleUserUpdate}
+                    anchor={userMenuAnchor}
+                    onClose={() => setUserMenuAnchor(null)}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-10">
-          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">My Whiteboards</h2>
-              <p className="text-muted-foreground">
-                Manage your projects and collaborate with your team.
-              </p>
-            </div>
-
-            <button
-              onClick={createNewWhiteboard}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 font-semibold"
-            >
-              <Plus size={20} />
-              New Whiteboard
-            </button>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Top Bar: Search & Title */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground mb-1">My Whiteboards</h2>
+            <p className="text-muted-foreground text-sm">
+              Manage your projects and collaborate with your team.
+            </p>
           </div>
 
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"
-              placeholder="Search whiteboards..."
+              placeholder="Search boards..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 border border-input bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 border border-input bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm text-sm"
             />
           </div>
         </div>
@@ -254,65 +248,62 @@ function DashboardPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredBoards.map((board) => (
-              <div
-                key={board.id}
-                className="group bg-card border border-border rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
-              >
-                <div
-                  onClick={() => openWhiteboard(board.id)}
-                  className="cursor-pointer"
-                >
-                  <div className="h-48 bg-muted/30 flex items-center justify-center border-b border-border/50 relative overflow-hidden group-hover:bg-muted/50 transition-colors">
-                    {/* Placeholder Preview */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
-                      <svg
-                        viewBox="0 0 100 100"
-                        className="w-1/2 h-1/2 text-muted-foreground/30"
-                        fill="currentColor"
-                      >
-                        <rect x="20" y="20" width="60" height="40" rx="4" />
-                        <circle cx="70" cy="30" r="5" />
-                        <rect x="30" y="35" width="30" height="4" rx="2" />
-                        <rect x="30" y="45" width="40" height="4" rx="2" />
-                      </svg>
-                    </div>
-
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
-                  </div>
-
-                  <div className="p-5">
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-foreground mb-2 truncate group-hover:text-primary transition-colors">
-                          {board.title}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">
-                            Whiteboard
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {formatDate(board.updatedAt)}
-                          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredBoards.map((board) => (
+                  <div
+                    key={board.id}
+                    className="group bg-card border border-border rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
+                  >
+                    <div
+                      onClick={() => openWhiteboard(board.id)}
+                      className="cursor-pointer"
+                    >
+                      <div className="h-40 bg-muted/30 flex items-center justify-center border-b border-border/50 relative overflow-hidden group-hover:bg-muted/50 transition-colors">
+                        {/* Placeholder Preview */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-70 transition-opacity">
+                          <svg
+                            viewBox="0 0 100 100"
+                            className="w-1/2 h-1/2 text-muted-foreground/30"
+                            fill="currentColor"
+                          >
+                            <rect x="20" y="20" width="60" height="40" rx="4" />
+                            <circle cx="70" cy="30" r="5" />
+                            <rect x="30" y="35" width="30" height="4" rx="2" />
+                            <rect x="30" y="45" width="40" height="4" rx="2" />
+                          </svg>
                         </div>
+
+                        {/* Overlay on hover */}
+                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
                       </div>
 
-                      <button
-                        onClick={(e) => handleMenuOpen(e, board)}
-                        className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      >
-                        <MoreVertical size={18} />
-                      </button>
+                      <div className="p-4">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base font-bold text-foreground mb-1 truncate group-hover:text-primary transition-colors">
+                              {board.title}
+                            </h3>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">
+                                {formatDate(board.updatedAt)}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={(e) => handleMenuOpen(e, board)}
+                            className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          >
+                            <MoreVertical size={16} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
         )}
-      </div>
+      </main>
 
       {/* Board Options Menu */}
       {Boolean(anchorEl) && (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import CollaborationVisual from '../components/home/CollaborationVisual';
 import {
   Paintbrush,
   Zap,
@@ -102,9 +103,6 @@ function HomePage() {
               </button>
               {user ? (
                 <>
-                  <span className="hidden sm:inline text-sm text-muted-foreground">
-                    Welcome, {user.name || user.username || user.email}
-                  </span>
                   <div className="relative">
                     <button
                       onClick={(e) => setUserMenuAnchor(e.currentTarget)}
@@ -121,12 +119,6 @@ function HomePage() {
                       onClose={() => setUserMenuAnchor(null)}
                     />
                   </div>
-                  <button
-                    onClick={() => navigate('/dashboard')}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
-                  >
-                    Dashboard
-                  </button>
                 </>
               ) : (
                 <>
@@ -151,59 +143,68 @@ function HomePage() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-16 md:pt-24 pb-32">
+        <section className="relative overflow-hidden pt-20 md:pt-32 pb-32">
+          {/* Background Elements */}
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background"></div>
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-5xl md:text-7xl font-extrabold text-foreground tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
-              Collaborate in <span className="text-primary">Real-Time</span> on Digital Whiteboards
+          <div className="absolute inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+          <div className="absolute top-0 left-0 right-0 h-[500px] bg-grid-slate-900/[0.04] dark:bg-grid-slate-400/[0.05] [mask-image:linear-gradient(to_bottom,white,transparent)] -z-10"></div>
+
+          <div className="container mx-auto px-4 text-center relative z-10">
+            
+            <h2 className="text-5xl md:text-7xl font-extrabold text-foreground tracking-tight mb-6 max-w-4xl mx-auto leading-tight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
+              Collaborate in <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">Real-Time</span> on Digital Whiteboards
             </h2>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            
+            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
               Create, share, and collaborate on whiteboards with your team. Perfect for brainstorming, design, and project planning.
             </p>
-            {!user ? (
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2"
-                >
-                  Get Started Free <ArrowRight size={20} />
-                </button>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="px-8 py-4 text-lg bg-card border border-border text-foreground rounded-full hover:bg-accent transition-colors font-semibold"
-                >
-                  Sign In
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 mx-auto"
-              >
-                Go to Your Whiteboards <ArrowRight size={20} />
-              </button>
-            )}
-
-            {/* Abstract decoration */}
-            <div className="mt-16 relative mx-auto max-w-5xl">
-              <div className="aspect-[16/9] bg-card rounded-xl border border-border shadow-2xl overflow-hidden relative">
-                <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 font-bold text-4xl">
-                  Interactive Whiteboard Preview
+            
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+              {!user ? (
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <button
+                    onClick={() => navigate('/signup')}
+                    className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 hover:-translate-y-1"
+                  >
+                    Get Started Free <ArrowRight size={20} />
+                  </button>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="px-8 py-4 text-lg bg-card border border-border text-foreground rounded-full hover:bg-accent transition-all font-semibold hover:-translate-y-1"
+                  >
+                    Sign In
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-8 py-4 text-lg bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 font-semibold flex items-center gap-2 mx-auto hover:-translate-y-1"
+                >
+                  Go to Your Whiteboards <ArrowRight size={20} />
+                </button>
+              )}
+            </div>
+
+            {/* Interactive Whiteboard Preview */}
+            <div className="mt-20 relative mx-auto max-w-6xl aspect-[16/9] animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+               <CollaborationVisual />
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="py-24 bg-muted/30">
-          <div className="container mx-auto px-4">
+        <section className="py-24 bg-muted/30 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+          <div className="absolute -left-40 top-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute -right-40 bottom-40 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl"></div>
+
+          <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-16">
               <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Everything You Need to Collaborate
               </h3>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                 Powerful features designed to help your team work together seamlessly, no matter where they are.
               </p>
             </div>
@@ -213,17 +214,20 @@ function HomePage() {
                 return (
                   <div
                     key={index}
-                    className="group bg-card border border-border/50 rounded-2xl p-8 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+                    className="group bg-card border border-border/50 rounded-2xl p-8 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 relative overflow-hidden"
                   >
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
-                      <Icon size={24} />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm">
+                        <Icon size={28} />
+                      </div>
+                      <h4 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                        {feature.title}
+                      </h4>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {feature.description}
+                      </p>
                     </div>
-                    <h4 className="text-xl font-bold text-foreground mb-3">
-                      {feature.title}
-                    </h4>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
                   </div>
                 );
               })}
@@ -231,33 +235,19 @@ function HomePage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-24">
-          <div className="container mx-auto px-4">
-            <div className="relative rounded-3xl overflow-hidden bg-secondary px-6 py-20 text-center sm:px-12 lg:px-20">
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-              <div className="relative z-10 max-w-2xl mx-auto">
-                <h3 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">
-                  Ready to Start Collaborating?
-                </h3>
-                <p className="text-lg text-secondary-foreground/80 mb-10">
-                  Join thousands of teams already using Let's Collab to bring their ideas to life.
-                </p>
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="px-10 py-4 text-lg bg-background text-foreground rounded-full hover:bg-accent transition-all shadow-lg font-bold"
-                >
-                  Create Free Account
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
-      <footer className="py-8 border-t border-border bg-background">
-        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} Let's Collab. All rights reserved.</p>
+      <footer className="py-8 border-t border-border bg-muted/10">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Logo className="w-6 h-6" />
+              <span className="font-bold text-lg">Let's Collab</span>
+            </div>
+            <p className="text-muted-foreground text-sm">
+              &copy; {new Date().getFullYear()} Let's Collab. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
