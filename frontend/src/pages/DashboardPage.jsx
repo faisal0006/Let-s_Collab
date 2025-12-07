@@ -12,6 +12,8 @@ import {
   Sun,
   Moon,
   Menu,
+  ArrowUpDown,
+  Check,
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { whiteboardService } from "../services/index";
@@ -33,6 +35,8 @@ function DashboardPage() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [sortBy, setSortBy] = useState("updated-desc"); // updated-desc, updated-asc, name-asc, name-desc, created-desc, created-asc
+  const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -65,15 +69,36 @@ function DashboardPage() {
   }, [navigate]);
 
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredBoards(whiteboards);
-    } else {
-      const filtered = whiteboards.filter((board) =>
+    let filtered = whiteboards;
+
+    // Apply search filter
+    if (searchQuery.trim() !== "") {
+      filtered = whiteboards.filter((board) =>
         board.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredBoards(filtered);
     }
-  }, [searchQuery, whiteboards]);
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "name-asc":
+          return a.title.localeCompare(b.title);
+        case "name-desc":
+          return b.title.localeCompare(a.title);
+        case "created-asc":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case "created-desc":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case "updated-asc":
+          return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+        case "updated-desc":
+        default:
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+    });
+
+    setFilteredBoards(sorted);
+  }, [searchQuery, whiteboards, sortBy]);
 
   // Update timestamps every minute for dynamic "x minutes ago" display
   useEffect(() => {
@@ -158,6 +183,29 @@ function DashboardPage() {
     setUser(updatedUser);
   };
 
+  const handleSortChange = (newSortBy) => {
+    setSortBy(newSortBy);
+    setSortMenuAnchor(null);
+  };
+
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case "name-asc":
+        return "Name (A-Z)";
+      case "name-desc":
+        return "Name (Z-A)";
+      case "created-asc":
+        return "Oldest First";
+      case "created-desc":
+        return "Newest First";
+      case "updated-asc":
+        return "Least Recently Updated";
+      case "updated-desc":
+      default:
+        return "Recently Updated";
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = currentTime; // Use currentTime state instead of Date.now()
@@ -239,6 +287,76 @@ function DashboardPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-input bg-card rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm text-sm"
               />
+            </div>
+            <div className="relative">
+              <button
+                onClick={(e) => setSortMenuAnchor(e.currentTarget)}
+                className="px-4 py-2.5 border border-input bg-card rounded-xl hover:bg-accent transition-all shadow-sm inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap"
+                title="Sort boards"
+              >
+                <ArrowUpDown size={18} />
+                <span className="hidden sm:inline">{getSortLabel()}</span>
+              </button>
+
+              {Boolean(sortMenuAnchor) && (
+                <div className="fixed inset-0 z-50" onClick={() => setSortMenuAnchor(null)}>
+                  <div
+                    className="absolute bg-card border border-border rounded-xl shadow-xl w-56 py-1 animate-in fade-in zoom-in-95 duration-100"
+                    style={{
+                      top: sortMenuAnchor.getBoundingClientRect().bottom + 8,
+                      left: sortMenuAnchor.getBoundingClientRect().left,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-b border-border">
+                      Sort By
+                    </div>
+                    <button
+                      onClick={() => handleSortChange("updated-desc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Recently Updated</span>
+                      {sortBy === "updated-desc" && <Check size={16} className="text-primary" />}
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("updated-asc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Least Recently Updated</span>
+                      {sortBy === "updated-asc" && <Check size={16} className="text-primary" />}
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("created-desc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Newest First</span>
+                      {sortBy === "created-desc" && <Check size={16} className="text-primary" />}
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("created-asc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Oldest First</span>
+                      {sortBy === "created-asc" && <Check size={16} className="text-primary" />}
+                    </button>
+                    <div className="border-t border-border my-1"></div>
+                    <button
+                      onClick={() => handleSortChange("name-asc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Name (A-Z)</span>
+                      {sortBy === "name-asc" && <Check size={16} className="text-primary" />}
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("name-desc")}
+                      className="w-full px-4 py-2.5 text-left hover:bg-accent text-sm transition-colors flex items-center justify-between"
+                    >
+                      <span>Name (Z-A)</span>
+                      {sortBy === "name-desc" && <Check size={16} className="text-primary" />}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <button
               onClick={createNewWhiteboard}
