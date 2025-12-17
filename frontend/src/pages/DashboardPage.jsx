@@ -226,7 +226,6 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -243,6 +242,7 @@ function DashboardPage() {
               >
                 {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
+              {user && <InviteBox />}
               {user && (
                 <div className="relative">
                   <button
@@ -266,9 +266,7 @@ function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Top Bar: Search & Title */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-1">My Whiteboards</h2>
